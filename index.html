@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SQL Mastery Hub | Deep Topics, 70 MNC Questions & Playground</title>
+  <meta name="description" content="Master SQL deeply with 10 detailed learning modules, 70 frequently asked MNC interview questions, common beginner mistakes, interview tips, and an interactive query simulator.">
+  <link rel="stylesheet" href="style.css">
+  <!-- FontAwesome for UI Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+
+  <!-- Floating Gravity Particle Canvas -->
+  <canvas id="gravity-canvas"></canvas>
+
+  <!-- Main Website Container -->
+  <div id="app-container">
+    
+    <!-- Navbar Header -->
+    <header>
+      <div class="logo" data-navigate="home">
+        <i class="fa-solid fa-atom"></i> SQL Mastery Hub
+        <span class="logo-sub">Gravity Engine</span>
+      </div>
+      <nav>
+        <button class="nav-link" data-target="home"><i class="fa-solid fa-house"></i> Home</button>
+        <button class="nav-link" data-target="syllabus"><i class="fa-solid fa-book-open"></i> Learn SQL</button>
+        <button class="nav-link" data-target="questions"><i class="fa-solid fa-clipboard-question"></i> 70 MNC Qs</button>
+        <button class="nav-link" data-target="mistakes"><i class="fa-solid fa-triangle-exclamation"></i> Mistakes</button>
+        <button class="nav-link" data-target="tips"><i class="fa-solid fa-lightbulb"></i> Tips</button>
+        <button class="nav-link" data-target="simulator"><i class="fa-solid fa-terminal"></i> Simulator</button>
+        <button class="nav-link" data-target="quiz"><i class="fa-solid fa-graduation-cap"></i> Quiz</button>
+      </nav>
+    </header>
+
+    <!-- Main View Area -->
+    <main>
+      
+      <!-- SECTION 1: HOME PAGE -->
+      <section id="home" class="app-section">
+        <div class="hero-section">
+          <h1 class="hero-title">Master SQL with Gravity</h1>
+          <p class="hero-subtitle">Learn database querying deeply. Study 70 highly requested MNC interview questions, discover and avoid critical beginner mistakes, and run queries in real-time inside the interactive playground simulator.</p>
+          <div class="hero-buttons">
+            <button class="btn btn-primary" data-navigate="syllabus"><i class="fa-solid fa-rocket"></i> Start Learning</button>
+            <button class="btn" data-navigate="simulator"><i class="fa-solid fa-terminal"></i> Open SQL Simulator</button>
+          </div>
+
+          <div class="hero-features">
+            <div class="glass-card feature-card" data-navigate="syllabus">
+              <div class="feature-icon"><i class="fa-solid fa-graduation-cap"></i></div>
+              <h3>Deep Syllabus</h3>
+              <p>Explore DDL, joins, subqueries, CTEs, window functions, and indexing optimization.</p>
+            </div>
+            
+            <div class="glass-card feature-card" data-navigate="questions">
+              <div class="feature-icon"><i class="fa-solid fa-clipboard-question"></i></div>
+              <h3>70 MNC Qs</h3>
+              <p>Solve 70 real questions asked at Google, Amazon, and Meta, filtered by difficulty and company tags.</p>
+            </div>
+
+            <div class="glass-card feature-card" data-navigate="mistakes">
+              <div class="feature-icon"><i class="fa-solid fa-code-compare"></i></div>
+              <h3>Beginner Mistakes</h3>
+              <p>Avoid anti-patterns, understand null anomalies, and view bad vs. good side-by-side code diffs.</p>
+            </div>
+
+            <div class="glass-card feature-card" data-navigate="simulator">
+              <div class="feature-icon"><i class="fa-solid fa-terminal"></i></div>
+              <h3>Live SQL Editor</h3>
+              <p>Interact with our sandbox schema using real queries directly in your browser.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SECTION 2: LEARNING SYLLABUS -->
+      <section id="syllabus" class="app-section" style="display: none;">
+        <h2 style="font-size: 2rem; margin-bottom: 1.5rem;"><i class="fa-solid fa-book-open"></i> SQL Deep Dive Modules</h2>
+        <div class="syllabus-layout">
+          <div class="sidebar-topics" id="syllabus-sidebar">
+            <!-- Populated via Javascript -->
+          </div>
+          <div class="glass-card content-viewer" id="syllabus-content-viewer">
+            <div class="content-body" id="syllabus-content-body">
+              <!-- Populated via Javascript -->
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SECTION 3: 70 MNC QUESTIONS -->
+      <section id="questions" class="app-section" style="display: none;">
+        <h2 style="font-size: 2rem; margin-bottom: 1.5rem;"><i class="fa-solid fa-clipboard-question"></i> 70 MNC Interview Questions</h2>
+        <div class="questions-layout">
+          <!-- Filters Toolbar -->
+          <div class="glass-card filters-panel">
+            <div class="search-wrapper">
+              <i class="fa-solid fa-magnifying-glass"></i>
+              <input type="text" id="q-search" class="search-input" placeholder="Search questions or problem keywords...">
+            </div>
+            
+            <div class="filter-group">
+              <label for="q-filter-difficulty" style="font-size: 0.9rem; font-weight: 600;">Difficulty:</label>
+              <select id="q-filter-difficulty" class="filter-select">
+                <option value="all">All Difficulties</option>
+                <option value="easy">Easy</option>
+                <option value="medium">Medium</option>
+                <option value="hard">Hard</option>
+              </select>
+            </div>
+
+            <div class="filter-group">
+              <label for="q-filter-category" style="font-size: 0.9rem; font-weight: 600;">Category:</label>
+              <select id="q-filter-category" class="filter-select">
+                <!-- Populated via Javascript -->
+              </select>
+            </div>
+
+            <div class="filter-group">
+              <label for="q-filter-company" style="font-size: 0.9rem; font-weight: 600;">Company:</label>
+              <select id="q-filter-company" class="filter-select">
+                <!-- Populated via Javascript -->
+              </select>
+            </div>
+          </div>
+
+          <!-- Questions List -->
+          <div class="questions-list" id="questions-container">
+            <!-- Populated via Javascript -->
+          </div>
+
+          <!-- Pagination -->
+          <div class="pagination-container" id="q-pagination">
+            <!-- Populated via Javascript -->
+          </div>
+        </div>
+      </section>
+
+      <!-- SECTION 4: BEGINNER MISTAKES -->
+      <section id="mistakes" class="app-section" style="display: none;">
+        <h2 style="font-size: 2rem; margin-bottom: 1.5rem;"><i class="fa-solid fa-triangle-exclamation"></i> SQL Anti-Patterns & Beginner Mistakes</h2>
+        <p style="color: var(--text-muted); margin-bottom: 2rem; max-width: 800px;">Writing correct SQL means understanding the subtle rules of the language. Below are 6 of the most common beginner mistakes, anti-patterns, and NULL behavior anomalies with concrete side-by-side solutions.</p>
+        <div class="mistakes-grid" id="mistakes-list">
+          <!-- Populated via Javascript -->
+        </div>
+      </section>
+
+      <!-- SECTION 5: INTERVIEW TIPS -->
+      <section id="tips" class="app-section" style="display: none;">
+        <h2 style="font-size: 2rem; margin-bottom: 1.5rem;"><i class="fa-solid fa-lightbulb"></i> SQL Interview Strategies & Cheat Sheet</h2>
+        <p style="color: var(--text-muted); margin-bottom: 2rem; max-width: 800px;">When coding SQL during an interview, your logic and structure matter just as much as writing the correct syntax. Follow this systematic approach to excel in your technical interviews.</p>
+        <div class="tips-layout" id="tips-list-container">
+          <!-- Populated via Javascript -->
+        </div>
+      </section>
+
+      <!-- SECTION 6: SQL PLAYGROUND SIMULATOR -->
+      <section id="simulator" class="app-section" style="display: none;">
+        <h2 style="font-size: 2rem; margin-bottom: 1.5rem;"><i class="fa-solid fa-terminal"></i> Interactive SQL Playground</h2>
+        <div class="simulator-layout">
+          <!-- Left schema reference panel -->
+          <div class="schema-panel">
+            <div class="glass-card schema-card">
+              <h4>employees <i class="fa-solid fa-table"></i></h4>
+              <ul class="schema-fields">
+                <li><span>emp_id (PK)</span> <span>INT</span></li>
+                <li><span>first_name</span> <span>VARCHAR</span></li>
+                <li><span>last_name</span> <span>VARCHAR</span></li>
+                <li><span>dept_id (FK)</span> <span>INT</span></li>
+                <li><span>salary</span> <span>INT</span></li>
+                <li><span>hire_date</span> <span>DATE</span></li>
+              </ul>
+            </div>
+            
+            <div class="glass-card schema-card">
+              <h4>departments <i class="fa-solid fa-table"></i></h4>
+              <ul class="schema-fields">
+                <li><span>dept_id (PK)</span> <span>INT</span></li>
+                <li><span>dept_name</span> <span>VARCHAR</span></li>
+                <li><span>location</span> <span>VARCHAR</span></li>
+              </ul>
+            </div>
+          </div>
+
+          <!-- Right query runner editor -->
+          <div class="query-editor-wrapper">
+            <div class="glass-card">
+              <div class="textarea-container">
+                <textarea id="sql-query" class="sql-textarea" spellcheck="false"></textarea>
+              </div>
+              <div class="query-actions" style="margin-top: 1rem;">
+                <button class="btn btn-primary" id="run-sql"><i class="fa-solid fa-play"></i> Run Query</button>
+              </div>
+            </div>
+
+            <div class="terminal-result" id="console-result">
+              <span style="color: var(--text-muted);">Run the default query above, or edit it to query employee and department statistics.</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SECTION 7: TAKE QUIZ -->
+      <section id="quiz" class="app-section" style="display: none;">
+        <h2 style="font-size: 2rem; margin-bottom: 1.5rem; text-align: center;"><i class="fa-solid fa-graduation-cap"></i> SQL Knowledge Check Quiz</h2>
+        <div class="glass-card quiz-container" id="quiz-area">
+          <!-- Populated via Javascript -->
+        </div>
+      </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer>
+      <p>&copy; 2026 SQL Mastery Hub. Generated with <span>&hearts;</span> and Gravity physics.</p>
+    </footer>
+
+  </div>
+
+  <!-- Loading Scripts -->
+  <script src="data.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
