@@ -1,6 +1,31 @@
-// SQL Mastery Hub - App Logic
+// SQL Mastery Hub - Upgraded App Logic (v2)
 
-// Ensure dependencies are loaded
+// Global database session state
+let MOCK_DB = {
+  departments: [
+    { dept_id: 1, dept_name: "Engineering", location: "San Francisco" },
+    { dept_id: 2, dept_name: "Product Management", location: "New York" },
+    { dept_id: 3, dept_name: "Sales Operations", location: "London" },
+    { dept_id: 4, dept_name: "Marketing Analytics", location: "Tokyo" }
+  ],
+  employees: [
+    { emp_id: 101, first_name: "Alice", last_name: "Smith", dept_id: 1, salary: 125000, hire_date: "2021-03-15" },
+    { emp_id: 102, first_name: "Bob", last_name: "Johnson", dept_id: 1, salary: 98000, hire_date: "2022-06-01" },
+    { emp_id: 103, first_name: "Carol", last_name: "Danvers", dept_id: 2, salary: 135000, hire_date: "2020-01-10" },
+    { emp_id: 104, first_name: "David", last_name: "Miller", dept_id: 3, salary: 72000, hire_date: "2023-02-18" },
+    { emp_id: 105, first_name: "Eva", last_name: "Green", dept_id: 3, salary: 88000, hire_date: "2021-11-05" },
+    { emp_id: 106, first_name: "Frank", last_name: "Wright", dept_id: 4, salary: 67000, hire_date: "2024-05-12" },
+    { emp_id: 107, first_name: "Grace", last_name: "Hopper", dept_id: 1, salary: 165000, hire_date: "2019-08-20" },
+    { emp_id: 108, first_name: "Harry", last_name: "Potter", dept_id: 2, salary: 55000, hire_date: "2023-10-31" }
+  ]
+};
+
+// Track created table structures dynamically for schema panel
+let DYNAMIC_SCHEMAS = {
+  departments: { dept_id: "INT", dept_name: "VARCHAR", location: "VARCHAR" },
+  employees: { emp_id: "INT", first_name: "VARCHAR", last_name: "VARCHAR", dept_id: "INT", salary: "INT", hire_date: "DATE" }
+};
+
 document.addEventListener("DOMContentLoaded", () => {
   initGravityCanvas();
   initRouter();
@@ -8,6 +33,10 @@ document.addEventListener("DOMContentLoaded", () => {
   initMNCQuestions();
   initSQLSimulator();
   initQuiz();
+  initRoadmap();
+  initResourceHub();
+  initRecommendationEngine();
+  setupAdminForms();
 });
 
 /* ==========================================================================
@@ -58,34 +87,28 @@ function initGravityCanvas() {
       this.y = initial ? Math.random() * height : -30;
       this.vx = (Math.random() - 0.5) * 0.8;
       this.vy = (Math.random() - 0.5) * 0.8;
-      this.mass = 10 + Math.random() * 20;
     }
 
     update() {
-      // Natural float
       this.x += this.vx;
       this.y += this.vy;
 
-      // Wrap-around screen boundaries
       if (this.x < -this.width) this.x = width + 10;
       if (this.x > width + 10) this.x = -this.width;
       if (this.y < -30) this.y = height + 10;
       if (this.y > height + 10) this.y = -30;
 
-      // Mouse gravity attraction / repulsion
       if (mouse.active) {
         const dx = mouse.x - (this.x + this.width / 2);
         const dy = mouse.y - (this.y + this.height / 2);
         const dist = Math.sqrt(dx * dx + dy * dy);
 
         if (dist < 250) {
-          // Attract towards cursor
           const force = (250 - dist) / 250;
           const pull = force * 0.15;
           this.vx += (dx / dist) * pull;
           this.vy += (dy / dist) * pull;
 
-          // Repel if too close to mouse (acting like orbiting stars)
           if (dist < 80) {
             const push = (80 - dist) * 0.08;
             this.vx -= (dx / dist) * push;
@@ -94,7 +117,6 @@ function initGravityCanvas() {
         }
       }
 
-      // Speed friction to avoid particles accelerating to infinity
       this.vx *= 0.98;
       this.vy *= 0.98;
     }
@@ -102,29 +124,21 @@ function initGravityCanvas() {
     draw() {
       ctx.save();
       ctx.translate(this.x, this.y);
-
-      // Glassmorphism Capsule style
       ctx.fillStyle = "rgba(19, 15, 38, 0.4)";
       ctx.strokeStyle = "rgba(139, 92, 246, 0.15)";
       ctx.lineWidth = 1;
-
-      // Draw rounded rect capsule
       ctx.beginPath();
       ctx.roundRect(0, 0, this.width, this.height, 15);
       ctx.fill();
       ctx.stroke();
 
-      // Soft glow shadow
       ctx.shadowColor = "rgba(6, 182, 212, 0.2)";
       ctx.shadowBlur = 6;
-
-      // Draw text
       ctx.fillStyle = "rgba(156, 163, 175, 0.6)";
       ctx.font = "500 13px Outfit";
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
       ctx.fillText(this.text, this.width / 2, this.height / 2 + 1);
-
       ctx.restore();
     }
   }
@@ -133,8 +147,6 @@ function initGravityCanvas() {
 
   function animate() {
     ctx.clearRect(0, 0, width, height);
-
-    // Draw grid background lines (dynamic effect)
     ctx.strokeStyle = "rgba(255, 255, 255, 0.015)";
     ctx.lineWidth = 1;
     const gridSize = 80;
@@ -151,7 +163,6 @@ function initGravityCanvas() {
       ctx.stroke();
     }
 
-    // Update & draw particles
     particles.forEach((p) => {
       p.update();
       p.draw();
@@ -170,8 +181,7 @@ function initRouter() {
   const navLinks = document.querySelectorAll(".nav-link");
   const sections = document.querySelectorAll(".app-section");
 
-  function navigateTo(targetId) {
-    // Update Nav buttons
+  window.navigateTo = (targetId) => {
     navLinks.forEach((link) => {
       if (link.getAttribute("data-target") === targetId) {
         link.classList.add("active");
@@ -180,7 +190,6 @@ function initRouter() {
       }
     });
 
-    // Update Visible Sections
     sections.forEach((section) => {
       if (section.id === targetId) {
         section.style.display = "block";
@@ -189,26 +198,24 @@ function initRouter() {
         section.style.display = "none";
       }
     });
-  }
+  };
 
   navLinks.forEach((link) => {
     link.addEventListener("click", () => {
       const target = link.getAttribute("data-target");
-      navigateTo(target);
+      window.navigateTo(target);
     });
   });
 
-  // Setup landing links (e.g. "Start Learning" button)
   document.querySelectorAll("[data-navigate]").forEach((el) => {
     el.addEventListener("click", (e) => {
       e.preventDefault();
       const target = el.getAttribute("data-navigate");
-      navigateTo(target);
+      window.navigateTo(target);
     });
   });
 
-  // Default land
-  navigateTo("home");
+  window.navigateTo("home");
 }
 
 /* ==========================================================================
@@ -219,7 +226,6 @@ function initSyllabus() {
   const contentBody = document.getElementById("syllabus-content-body");
   if (!sidebar || !contentBody) return;
 
-  // Render Sidebar buttons
   sidebar.innerHTML = window.SQL_TOPICS.map((topic, index) => `
     <button class="topic-btn ${index === 0 ? "active" : ""}" data-id="${topic.id}">
       <h4>${topic.title}</h4>
@@ -227,18 +233,16 @@ function initSyllabus() {
     </button>
   `).join("");
 
-  function displayTopic(topicId) {
+  window.displayTopic = (topicId) => {
     const topic = window.SQL_TOPICS.find((t) => t.id === topicId);
     if (!topic) return;
 
     let contentHTML = topic.content;
 
-    // Inject SVG Venn diagram dynamically for Joins module
     if (topicId === "joins") {
       contentHTML += `
         <div class="join-diagram-container">
           <h4>Interactive JOIN Venn Diagram</h4>
-          <p style="font-size: 0.9rem; color: var(--text-muted);">Hover/Click the buttons below to visualize the dataset returned by different join operations.</p>
           <div class="join-controls">
             <button class="join-control-btn active" data-join="inner">INNER JOIN</button>
             <button class="join-control-btn" data-join="left">LEFT JOIN</button>
@@ -246,14 +250,9 @@ function initSyllabus() {
             <button class="join-control-btn" data-join="full">FULL OUTER JOIN</button>
           </div>
           <svg class="join-svg" viewBox="0 0 300 200">
-            <!-- Left circle (Table A) -->
             <path id="circle-a" class="join-circle" d="M 120 100 A 60 60 0 1 1 120 99 Z" style="fill: rgba(139, 92, 246, 0.45);"/>
-            <!-- Right circle (Table B) -->
             <path id="circle-b" class="join-circle" d="M 180 100 A 60 60 0 1 1 180 99 Z" style="fill: rgba(139, 92, 246, 0.45);"/>
-            <!-- Intersecting shape -->
             <path id="intersection" class="join-intersection" d="M 150 50 A 60 60 0 0 1 180 100 A 60 60 0 0 1 150 150 A 60 60 0 0 1 120 100 A 60 60 0 0 1 150 50 Z" style="fill: rgba(6, 182, 212, 0.7);"/>
-            
-            <!-- Labels -->
             <text x="75" y="105" class="join-label" fill="#fff">Table A</text>
             <text x="225" y="105" class="join-label" fill="#fff">Table B</text>
           </svg>
@@ -263,24 +262,21 @@ function initSyllabus() {
 
     contentBody.innerHTML = contentHTML;
 
-    // Re-attach Venn Diagram listeners if active
     if (topicId === "joins") {
       setupJoinDiagram();
     }
-  }
+  };
 
-  // Handle sidebar clicks
   const topicBtns = sidebar.querySelectorAll(".topic-btn");
   topicBtns.forEach((btn) => {
     btn.addEventListener("click", () => {
       topicBtns.forEach((b) => b.classList.remove("active"));
       btn.classList.add("active");
-      displayTopic(btn.getAttribute("data-id"));
+      window.displayTopic(btn.getAttribute("data-id"));
     });
   });
 
-  // Display initial topic
-  displayTopic(window.SQL_TOPICS[0].id);
+  window.displayTopic(window.SQL_TOPICS[0].id);
 }
 
 function setupJoinDiagram() {
@@ -292,26 +288,10 @@ function setupJoinDiagram() {
   if (!circleA || !circleB || !intersection) return;
 
   const joinStates = {
-    inner: {
-      a: "rgba(139, 92, 246, 0.05)",
-      b: "rgba(139, 92, 246, 0.05)",
-      i: "rgba(6, 182, 212, 0.85)"
-    },
-    left: {
-      a: "rgba(6, 182, 212, 0.85)",
-      b: "rgba(139, 92, 246, 0.05)",
-      i: "rgba(6, 182, 212, 0.85)"
-    },
-    right: {
-      a: "rgba(139, 92, 246, 0.05)",
-      b: "rgba(6, 182, 212, 0.85)",
-      i: "rgba(6, 182, 212, 0.85)"
-    },
-    full: {
-      a: "rgba(6, 182, 212, 0.85)",
-      b: "rgba(6, 182, 212, 0.85)",
-      i: "rgba(6, 182, 212, 0.85)"
-    }
+    inner: { a: "rgba(139, 92, 246, 0.05)", b: "rgba(139, 92, 246, 0.05)", i: "rgba(6, 182, 212, 0.85)" },
+    left: { a: "rgba(6, 182, 212, 0.85)", b: "rgba(139, 92, 246, 0.05)", i: "rgba(6, 182, 212, 0.85)" },
+    right: { a: "rgba(139, 92, 246, 0.05)", b: "rgba(6, 182, 212, 0.85)", i: "rgba(6, 182, 212, 0.85)" },
+    full: { a: "rgba(6, 182, 212, 0.85)", b: "rgba(6, 182, 212, 0.85)", i: "rgba(6, 182, 212, 0.85)" }
   };
 
   function applyColors(joinType) {
@@ -329,12 +309,19 @@ function setupJoinDiagram() {
     });
   });
 
-  // Apply default state (inner join)
   applyColors("inner");
 }
 
+window.tryInSimulator = (query) => {
+  window.navigateTo("simulator");
+  const sqlInput = document.getElementById("sql-query");
+  if (sqlInput) {
+    sqlInput.value = query;
+  }
+};
+
 /* ==========================================================================
-   4. 70 MNC Interview Questions Panel (Search, Filter, Paginate)
+   4. 70 MNC Interview Questions
    ========================================================================== */
 function initMNCQuestions() {
   const container = document.getElementById("questions-container");
@@ -346,11 +333,9 @@ function initMNCQuestions() {
 
   if (!container || !pagination) return;
 
-  // Extract distinct categories and companies for dropdown lists
   const categories = [...new Set(window.SQL_QUESTIONS.map((q) => q.category))].sort();
   const companies = [...new Set(window.SQL_QUESTIONS.flatMap((q) => q.companies))].sort();
 
-  // Populate filter selectors
   if (filterCategory) {
     filterCategory.innerHTML = `<option value="all">All Categories</option>` +
       categories.map((c) => `<option value="${c}">${c}</option>`).join("");
@@ -362,15 +347,15 @@ function initMNCQuestions() {
 
   let currentPage = 1;
   const itemsPerPage = 8;
-  let filteredQuestions = [...window.SQL_QUESTIONS];
+  window.filteredQuestions = [...window.SQL_QUESTIONS];
 
-  function filterQuestions() {
+  window.filterQuestions = () => {
     const query = searchInput.value.toLowerCase();
     const diff = filterDiff.value;
     const cat = filterCategory.value;
     const comp = filterCompany.value;
 
-    filteredQuestions = window.SQL_QUESTIONS.filter((q) => {
+    window.filteredQuestions = window.SQL_QUESTIONS.filter((q) => {
       const matchesSearch = q.title.toLowerCase().includes(query) || q.problem.toLowerCase().includes(query);
       const matchesDiff = diff === "all" || q.difficulty.toLowerCase() === diff.toLowerCase();
       const matchesCat = cat === "all" || q.category === cat;
@@ -381,18 +366,17 @@ function initMNCQuestions() {
 
     currentPage = 1;
     renderQuestions();
-  }
+  };
 
   function renderQuestions() {
     const startIndex = (currentPage - 1) * itemsPerPage;
-    const paginatedItems = filteredQuestions.slice(startIndex, startIndex + itemsPerPage);
+    const paginatedItems = window.filteredQuestions.slice(startIndex, startIndex + itemsPerPage);
 
     if (paginatedItems.length === 0) {
       container.innerHTML = `
         <div style="text-align: center; padding: 3rem; color: var(--text-muted);">
           <i class="fa-solid fa-magnifying-glass" style="font-size: 2.5rem; margin-bottom: 1rem; color: var(--accent-purple);"></i>
           <h3>No matching SQL questions found</h3>
-          <p>Try clearing filters or checking spelling.</p>
         </div>
       `;
       pagination.innerHTML = "";
@@ -410,38 +394,19 @@ function initMNCQuestions() {
           </div>
           <div class="q-tags">
             ${q.companies.slice(0, 3).map((c) => `<span class="tag tag-company">${c}</span>`).join("")}
-            ${q.companies.length > 3 ? `<span class="tag tag-company">+${q.companies.length - 3}</span>` : ""}
           </div>
           <i class="fa-solid fa-chevron-down accordion-arrow"></i>
         </div>
         <div class="question-body">
           <div class="question-details">
-            <div class="q-problem-statement">
-              <strong>Problem Statement:</strong><br>
-              ${q.problem}
+            <div class="q-problem-statement"><strong>Problem:</strong> ${q.problem}</div>
+            ${q.schema ? `<pre class="q-schema"><code>${q.schema}</code></pre>` : ""}
+            <div class="q-solution-header">
+              <strong>Query:</strong>
+              <button class="q-copy-btn" onclick="copySolution(${q.id})">Copy Query</button>
             </div>
-            
-            ${q.schema ? `
-              <div>
-                <strong>Table Schema:</strong>
-                <pre class="q-schema"><code>${q.schema}</code></pre>
-              </div>
-            ` : ""}
-
-            <div>
-              <div class="q-solution-header">
-                <strong>Standard SQL Query:</strong>
-                <button class="q-copy-btn" onclick="copySolution(${q.id})">
-                  <i class="fa-solid fa-copy"></i> Copy Query
-                </button>
-              </div>
-              <pre><code class="language-sql" id="q-code-${q.id}">${escapeHTML(q.solution)}</code></pre>
-            </div>
-
-            <div>
-              <strong>Solution Explanation:</strong><br>
-              <p style="font-size: 0.95rem; color: var(--text-muted); margin-top: 5px;">${q.explanation}</p>
-            </div>
+            <pre><code class="language-sql" id="q-code-${q.id}">${q.solution}</code></pre>
+            <p style="font-size: 0.95rem; color: var(--text-muted);">${q.explanation}</p>
           </div>
         </div>
       </div>
@@ -451,18 +416,14 @@ function initMNCQuestions() {
   }
 
   function renderPagination() {
-    const totalPages = Math.ceil(filteredQuestions.length / itemsPerPage);
+    const totalPages = Math.ceil(window.filteredQuestions.length / itemsPerPage);
     if (totalPages <= 1) {
       pagination.innerHTML = "";
       return;
     }
 
-    let buttonsHTML = "";
+    let buttonsHTML = `<button class="page-btn" ${currentPage === 1 ? "disabled" : ""} onclick="changePage(${currentPage - 1})"><i class="fa-solid fa-chevron-left"></i></button>`;
 
-    // Prev Button
-    buttonsHTML += `<button class="page-btn" ${currentPage === 1 ? "disabled" : ""} onclick="changePage(${currentPage - 1})"><i class="fa-solid fa-chevron-left"></i></button>`;
-
-    // Page numbers
     for (let i = 1; i <= totalPages; i++) {
       if (i === 1 || i === totalPages || (i >= currentPage - 1 && i <= currentPage + 1)) {
         buttonsHTML += `<button class="page-btn ${i === currentPage ? "active" : ""}" onclick="changePage(${i})">${i}</button>`;
@@ -471,19 +432,15 @@ function initMNCQuestions() {
       }
     }
 
-    // Next Button
     buttonsHTML += `<button class="page-btn" ${currentPage === totalPages ? "disabled" : ""} onclick="changePage(${currentPage + 1})"><i class="fa-solid fa-chevron-right"></i></button>`;
-
     pagination.innerHTML = buttonsHTML;
   }
 
-  // Bind event listeners
-  searchInput.addEventListener("input", filterQuestions);
-  filterDiff.addEventListener("change", filterQuestions);
-  filterCategory.addEventListener("change", filterQuestions);
-  filterCompany.addEventListener("change", filterQuestions);
+  searchInput.addEventListener("input", window.filterQuestions);
+  filterDiff.addEventListener("change", window.filterQuestions);
+  filterCategory.addEventListener("change", window.filterQuestions);
+  filterCompany.addEventListener("change", window.filterQuestions);
 
-  // Global functions to bind to DOM
   window.changePage = (page) => {
     currentPage = page;
     renderQuestions();
@@ -492,38 +449,21 @@ function initMNCQuestions() {
   window.toggleAccordion = (id) => {
     const accordion = document.getElementById(`q-acc-${id}`);
     if (!accordion) return;
-
     const isActive = accordion.classList.contains("active");
-
-    // Collapse others in view
-    document.querySelectorAll(".question-accordion").forEach((acc) => {
-      acc.classList.remove("active");
-    });
-
-    if (!isActive) {
-      accordion.classList.add("active");
-    }
+    document.querySelectorAll(".question-accordion").forEach((acc) => acc.classList.remove("active"));
+    if (!isActive) accordion.classList.add("active");
   };
 
   window.copySolution = (id) => {
     const code = document.getElementById(`q-code-${id}`).innerText;
     navigator.clipboard.writeText(code).then(() => {
       const btn = document.querySelector(`#q-acc-${id} .q-copy-btn`);
-      btn.innerHTML = `<i class="fa-solid fa-check" style="color: #10b981;"></i> Copied!`;
-      setTimeout(() => {
-        btn.innerHTML = `<i class="fa-solid fa-copy"></i> Copy Query`;
-      }, 2000);
+      btn.innerText = "Copied!";
+      setTimeout(() => { btn.innerText = "Copy Query"; }, 2000);
     });
   };
 
-  function escapeHTML(str) {
-    return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
-  }
-
-  // Initial Draw
   renderQuestions();
-
-  // Populate beginner mistakes list on mistakes panel
   initBeginnerMistakes();
   initInterviewTips();
 }
@@ -531,20 +471,18 @@ function initMNCQuestions() {
 function initBeginnerMistakes() {
   const container = document.getElementById("mistakes-list");
   if (!container) return;
-
   container.innerHTML = window.BEGINNER_MISTAKES.map((m, i) => `
     <div class="glass-card mistake-card">
       <h3><i class="fa-solid fa-triangle-exclamation"></i> ${i + 1}. ${m.title}</h3>
-      <p style="color: var(--text-muted); font-size: 0.95rem;">${m.desc}</p>
-      
+      <p style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 8px;">${m.desc}</p>
       <div class="code-comparison">
         <div class="code-comp-box bad">
           <div class="code-comp-label">❌ Bad Practice</div>
-          <pre><code class="language-sql">${m.bad}</code></pre>
+          <pre><code>${m.bad}</code></pre>
         </div>
         <div class="code-comp-box good">
           <div class="code-comp-label">✅ Good Practice</div>
-          <pre><code class="language-sql">${m.good}</code></pre>
+          <pre><code>${m.good}</code></pre>
         </div>
       </div>
     </div>
@@ -554,7 +492,6 @@ function initBeginnerMistakes() {
 function initInterviewTips() {
   const container = document.getElementById("tips-list-container");
   if (!container) return;
-
   container.innerHTML = window.INTERVIEW_TIPS.map((cat) => `
     <div class="glass-card tip-category-card">
       <h3>${cat.category}</h3>
@@ -566,81 +503,113 @@ function initInterviewTips() {
 }
 
 /* ==========================================================================
-   5. SQL Query Simulator (Playground Engine)
+   5. SQL Query Simulator & Custom Parser Upgrades
    ========================================================================== */
 function initSQLSimulator() {
   const sqlInput = document.getElementById("sql-query");
   const runBtn = document.getElementById("run-sql");
   const consoleResult = document.getElementById("console-result");
+  const projectSelect = document.getElementById("project-select");
+  const projectChallenges = document.getElementById("project-challenges");
 
-  if (!sqlInput || !runBtn || !consoleResult) return;
-
-  // Mock Database tables
-  const MOCK_DB = {
-    departments: [
-      { dept_id: 1, dept_name: "Engineering", location: "San Francisco" },
-      { dept_id: 2, dept_name: "Product Management", location: "New York" },
-      { dept_id: 3, dept_name: "Sales Operations", location: "London" },
-      { dept_id: 4, dept_name: "Marketing Analytics", location: "Tokyo" }
-    ],
-    employees: [
-      { emp_id: 101, first_name: "Alice", last_name: "Smith", dept_id: 1, salary: 125000, hire_date: "2021-03-15" },
-      { emp_id: 102, first_name: "Bob", last_name: "Johnson", dept_id: 1, salary: 98000, hire_date: "2022-06-01" },
-      { emp_id: 103, first_name: "Carol", last_name: "Danvers", dept_id: 2, salary: 135000, hire_date: "2020-01-10" },
-      { emp_id: 104, first_name: "David", last_name: "Miller", dept_id: 3, salary: 72000, hire_date: "2023-02-18" },
-      { emp_id: 105, first_name: "Eva", last_name: "Green", dept_id: 3, salary: 88000, hire_date: "2021-11-05" },
-      { emp_id: 106, first_name: "Frank", last_name: "Wright", dept_id: 4, salary: 67000, hire_date: "2024-05-12" },
-      { emp_id: 107, first_name: "Grace", last_name: "Hopper", dept_id: 1, salary: 165000, hire_date: "2019-08-20" },
-      { emp_id: 108, first_name: "Harry", last_name: "Potter", dept_id: 2, salary: 55000, hire_date: "2023-10-31" }
-    ]
-  };
+  if (!sqlInput || !runBtn || !consoleResult || !projectSelect) return;
 
   runBtn.addEventListener("click", () => {
     const rawQuery = sqlInput.value.trim();
     if (!rawQuery) {
-      consoleResult.innerHTML = `<span class="terminal-error">Query is empty. Type a SELECT query to run against the database.</span>`;
+      consoleResult.innerHTML = `<span class="terminal-error">Query is empty.</span>`;
       return;
     }
 
     try {
-      const resultData = executeMockQuery(rawQuery, MOCK_DB);
-      renderTerminalTable(resultData);
+      if (rawQuery.toUpperCase().startsWith("CREATE")) {
+        executeCreateQuery(rawQuery);
+        consoleResult.innerHTML = `<span class="terminal-success-message"><i class="fa-solid fa-circle-check"></i> Table created successfully.</span>`;
+        refreshSchemaPanel();
+      } else if (rawQuery.toUpperCase().startsWith("INSERT")) {
+        executeInsertQuery(rawQuery);
+        consoleResult.innerHTML = `<span class="terminal-success-message"><i class="fa-solid fa-circle-check"></i> Row inserted successfully.</span>`;
+      } else {
+        const resultData = executeMockQuery(rawQuery, MOCK_DB);
+        renderTerminalTable(resultData);
+      }
     } catch (err) {
-      consoleResult.innerHTML = `
-        <span class="terminal-error">
-          <i class="fa-solid fa-circle-exclamation"></i> SQL Syntax Error:<br>
-          ${err.message}
-        </span>`;
+      consoleResult.innerHTML = `<span class="terminal-error"><i class="fa-solid fa-circle-exclamation"></i> SQL Error: ${err.message}</span>`;
     }
   });
 
-  function renderTerminalTable(rows) {
-    if (!rows || rows.length === 0) {
-      consoleResult.innerHTML = `
-        <div class="terminal-success-message">
-          <i class="fa-solid fa-circle-check"></i> Query executed successfully.
-        </div>
-        <span style="color: var(--text-muted);">Empty result set (0 rows returned).</span>`;
+  // Project selector logic
+  projectSelect.addEventListener("change", () => {
+    const projName = projectSelect.value;
+    if (projName === "none") {
+      projectChallenges.innerHTML = "";
       return;
     }
 
-    const columns = Object.keys(rows[0]);
+    const proj = window.MOCK_PROJECTS[projName];
+    if (!proj) return;
 
+    // Load tables into database session
+    for (let tableKey in proj.tables) {
+      MOCK_DB[tableKey] = proj.tables[tableKey];
+      // Generate dynamically
+      if (proj.tables[tableKey].length > 0) {
+        DYNAMIC_SCHEMAS[tableKey] = {};
+        Object.keys(proj.tables[tableKey][0]).forEach((k) => {
+          DYNAMIC_SCHEMAS[tableKey][k] = typeof proj.tables[tableKey][0][k] === "number" ? "INT" : "VARCHAR";
+        });
+      }
+    }
+    refreshSchemaPanel();
+
+    // Show challenge prompts
+    projectChallenges.innerHTML = `
+      <h4>${proj.title} Challenges</h4>
+      <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 8px;">${proj.desc} Click any challenge to load it:</p>
+      <div style="display: flex; flex-direction: column; gap: 8px;">
+        ${proj.challenges.map((c) => `
+          <button class="topic-btn" style="padding: 6px; font-size: 0.85rem;" onclick="loadChallengeQuery('${c.sql.replace(/'/g, "\\'")}')">
+            ${c.q}
+          </button>
+        `).join("")}
+      </div>
+    `;
+  });
+
+  window.loadChallengeQuery = (sql) => {
+    sqlInput.value = sql;
+  };
+
+  window.refreshSchemaPanel = () => {
+    const panel = document.getElementById("simulator-schema-panel");
+    if (!panel) return;
+
+    panel.innerHTML = Object.keys(DYNAMIC_SCHEMAS).map((table) => `
+      <div class="glass-card schema-card" style="margin-bottom: 10px;">
+        <h4>${table} <i class="fa-solid fa-table"></i></h4>
+        <ul class="schema-fields">
+          ${Object.keys(DYNAMIC_SCHEMAS[table]).map((field) => `
+            <li><span>${field}</span> <span>${DYNAMIC_SCHEMAS[table][field]}</span></li>
+          `).join("")}
+        </ul>
+      </div>
+    `).join("");
+  };
+
+  function renderTerminalTable(rows) {
+    if (!rows || rows.length === 0) {
+      consoleResult.innerHTML = `<span style="color: var(--text-muted);">Empty result (0 rows returned).</span>`;
+      return;
+    }
+    const columns = Object.keys(rows[0]);
     const headerHTML = columns.map((col) => `<th>${col}</th>`).join("");
     const rowsHTML = rows.map((row) => `
       <tr>
-        ${columns.map((col) => {
-          let val = row[col];
-          if (val === null || val === undefined) val = `<span style="color: #6b7280; font-style: italic;">NULL</span>`;
-          return `<td>${val}</td>`;
-        }).join("")}
+        ${columns.map((col) => `<td>${row[col] !== null ? row[col] : "NULL"}</td>`).join("")}
       </tr>
     `).join("");
 
     consoleResult.innerHTML = `
-      <div class="terminal-success-message">
-        <i class="fa-solid fa-circle-check"></i> Query executed successfully. (${rows.length} rows returned)
-      </div>
       <table class="terminal-table">
         <thead><tr>${headerHTML}</tr></thead>
         <tbody>${rowsHTML}</tbody>
@@ -648,34 +617,88 @@ function initSQLSimulator() {
     `;
   }
 
-  // Pre-load a default query
-  sqlInput.value = `SELECT e.emp_id, e.first_name, e.salary, d.dept_name 
-FROM employees e 
-JOIN departments d ON e.dept_id = d.dept_id 
-WHERE e.salary > 80000 
-ORDER BY e.salary DESC;`;
+  refreshSchemaPanel();
 }
 
-/**
- * A client-side Mock SQL Select Interpreter in JS
- * Supports: columns, aliases, inner/left join (single), where filters, order by, limit
- */
+function executeCreateQuery(sql) {
+  // CREATE TABLE test_table (id INT, name VARCHAR);
+  const match = sql.match(/CREATE\s+TABLE\s+(\w+)\s*\((.*?)\)/i);
+  if (!match) throw new Error("Invalid CREATE TABLE syntax.");
+
+  const tableName = match[1].toLowerCase();
+  const fieldsDef = match[2];
+
+  if (MOCK_DB[tableName]) {
+    throw new Error(`Table '${tableName}' already exists.`);
+  }
+
+  MOCK_DB[tableName] = [];
+  DYNAMIC_SCHEMAS[tableName] = {};
+
+  fieldsDef.split(",").forEach((def) => {
+    const parts = def.trim().split(/\s+/);
+    if (parts.length >= 2) {
+      DYNAMIC_SCHEMAS[tableName][parts[0]] = parts[1].toUpperCase();
+    }
+  });
+}
+
+function executeInsertQuery(sql) {
+  // INSERT INTO table_name VALUES (1, 'Alice');
+  // OR INSERT INTO table_name (c1, c2) VALUES (1, 'Alice');
+  const match = sql.match(/INSERT\s+INTO\s+(\w+)(?:\s*\((.*?)\))?\s*VALUES\s*\((.*?)\)/i);
+  if (!match) throw new Error("Invalid INSERT INTO syntax.");
+
+  const tableName = match[1].toLowerCase();
+  const columnsClause = match[2];
+  const valuesClause = match[3];
+
+  if (!MOCK_DB[tableName]) {
+    throw new Error(`Table '${tableName}' does not exist.`);
+  }
+
+  const values = valuesClause.split(",").map(v => {
+    let clean = v.trim();
+    if (clean.startsWith("'") || clean.startsWith('"')) {
+      return clean.slice(1, -1);
+    }
+    return isNaN(clean) ? clean : parseFloat(clean);
+  });
+
+  const row = {};
+  const schemaKeys = Object.keys(DYNAMIC_SCHEMAS[tableName]);
+
+  if (columnsClause) {
+    const cols = columnsClause.split(",").map(c => c.trim());
+    schemaKeys.forEach((key) => {
+      const valIdx = cols.indexOf(key);
+      row[key] = valIdx !== -1 ? values[valIdx] : null;
+    });
+  } else {
+    if (values.length !== schemaKeys.length) {
+      throw new Error("Value count does not match table column count.");
+    }
+    schemaKeys.forEach((key, idx) => {
+      row[key] = values[idx];
+    });
+  }
+
+  MOCK_DB[tableName].push(row);
+}
+
 function executeMockQuery(queryStr, db) {
-  // Normalize Query
   let sql = queryStr.replace(/\s+/g, " ").trim();
   if (sql.endsWith(";")) sql = sql.slice(0, -1).trim();
 
-  // Basic Check
   if (!sql.toUpperCase().startsWith("SELECT")) {
-    throw new Error("Only SELECT queries are supported in this browser console simulator.");
+    throw new Error("Only SELECT queries are supported in this simulator.");
   }
 
-  // Regex Parsing clauses
   const selectRegex = /^SELECT\s+(.*?)\s+FROM\s+(.*?)(?:\s+JOIN\s+(.*?)\s+ON\s+(.*?))?(?:\s+WHERE\s+(.*?))?(?:\s+ORDER\s+BY\s+(.*?))?(?:\s+LIMIT\s+(\d+))?$/i;
   const match = sql.match(selectRegex);
 
   if (!match) {
-    throw new Error("Could not parse query. Verify structure: SELECT [cols] FROM [table] [JOIN table ON c1=c2] [WHERE condition] [ORDER BY col] [LIMIT n]");
+    throw new Error("Could not parse query. Check syntax constraints.");
   }
 
   const selectClause = match[1].trim();
@@ -686,17 +709,16 @@ function executeMockQuery(queryStr, db) {
   const orderByClause = match[6] ? match[6].trim() : null;
   const limitClause = match[7] ? match[7].trim() : null;
 
-  // 1. Resolve Tables & Aliases
   const parseTableAndAlias = (clause) => {
     const parts = clause.split(/\s+/);
     const tableName = parts[0].toLowerCase();
-    const alias = parts[1] || parts[0]; // defaults to table name
+    const alias = parts[1] || parts[0];
     return { tableName, alias };
   };
 
   const primaryTable = parseTableAndAlias(primaryTableClause);
   if (!db[primaryTable.tableName]) {
-    throw new Error(`Table '${primaryTable.tableName}' not found. Available: employees, departments`);
+    throw new Error(`Table '${primaryTable.tableName}' not found.`);
   }
 
   let joinTable = null;
@@ -707,39 +729,25 @@ function executeMockQuery(queryStr, db) {
     }
   }
 
-  // Clone datasets
   let workingData = db[primaryTable.tableName].map(row => {
     const newRow = {};
-    for (let key in row) {
-      newRow[`${primaryTable.alias}.${key}`] = row[key];
-    }
+    for (let key in row) newRow[`${primaryTable.alias}.${key}`] = row[key];
     return newRow;
   });
 
-  // 2. Process JOIN
   if (joinTable) {
-    // Parse Join condition like: e.dept_id = d.dept_id
     const condParts = joinConditionClause.split("=");
-    if (condParts.length !== 2) {
-      throw new Error(`Invalid JOIN condition: '${joinConditionClause}'. Must be format table1.col1 = table2.col2`);
-    }
-
+    if (condParts.length !== 2) throw new Error("Invalid JOIN condition.");
     const condLeft = condParts[0].trim();
     const condRight = condParts[1].trim();
-
     const joinedData = [];
 
-    // Loop through primary table, lookup in join table
     workingData.forEach((rowA) => {
       let matched = false;
       db[joinTable.tableName].forEach((rowB) => {
-        // Construct rowB key map
         const rowBObj = {};
-        for (let key in rowB) {
-          rowBObj[`${joinTable.alias}.${key}`] = rowB[key];
-        }
+        for (let key in rowB) rowBObj[`${joinTable.alias}.${key}`] = rowB[key];
 
-        // Test Join condition
         const valLeft = rowA[condLeft] !== undefined ? rowA[condLeft] : rowBObj[condLeft];
         const valRight = rowA[condRight] !== undefined ? rowA[condRight] : rowBObj[condRight];
 
@@ -749,12 +757,9 @@ function executeMockQuery(queryStr, db) {
         }
       });
 
-      // Handle Left Join if no match (fill with nulls)
       if (!matched) {
         const nullRowB = {};
-        for (let key in db[joinTable.tableName][0]) {
-          nullRowB[`${joinTable.alias}.${key}`] = null;
-        }
+        for (let key in db[joinTable.tableName][0]) nullRowB[`${joinTable.alias}.${key}`] = null;
         joinedData.push({ ...rowA, ...nullRowB });
       }
     });
@@ -762,35 +767,22 @@ function executeMockQuery(queryStr, db) {
     workingData = joinedData;
   }
 
-  // 3. Process WHERE filter
   if (whereClause) {
-    // Basic filter matching format: alias.col op value
-    // Support operators: =, >, <, !=, LIKE
     const opMatch = whereClause.match(/(.*?)(=|!=|>|<|\bLIKE\b)(.*)/i);
-    if (!opMatch) {
-      throw new Error(`Unsupported or invalid WHERE clause: '${whereClause}'`);
-    }
-
+    if (!opMatch) throw new Error("WHERE clause syntax error.");
     const field = opMatch[1].trim();
     const operator = opMatch[2].trim().toUpperCase();
-    let valStr = opMatch[3].trim();
-
-    // Strip quotes from value
-    if ((valStr.startsWith("'") && valStr.endsWith("'")) || (valStr.startsWith('"') && valStr.endsWith('"'))) {
-      valStr = valStr.slice(1, -1);
-    }
+    let valStr = opMatch[3].trim().replace(/^['"]|['"]$/g, "");
 
     workingData = workingData.filter((row) => {
       let rowVal = row[field];
       if (rowVal === undefined) {
-        // Check if query omitted alias prefixes
         const fallbackKey = Object.keys(row).find((k) => k.endsWith(`.${field}`));
         rowVal = row[fallbackKey];
       }
 
       if (rowVal === undefined || rowVal === null) return false;
 
-      // Type cast if number
       const isNum = !isNaN(rowVal) && !isNaN(parseFloat(rowVal));
       const parsedRowVal = isNum ? parseFloat(rowVal) : rowVal;
       const parsedValStr = isNum ? parseFloat(valStr) : valStr;
@@ -800,76 +792,45 @@ function executeMockQuery(queryStr, db) {
       if (operator === ">") return parsedRowVal > parsedValStr;
       if (operator === "<") return parsedRowVal < parsedValStr;
       if (operator === "LIKE") {
-        const regexStr = parsedValStr.replace(/%/g, ".*").replace(/_/g, ".");
-        const regex = new RegExp(`^${regexStr}$`, "i");
+        const regex = new RegExp(`^${parsedValStr.replace(/%/g, ".*").replace(/_/g, ".")}$`, "i");
         return regex.test(String(parsedRowVal));
       }
       return false;
     });
   }
 
-  // 4. Select Projection Columns
   let projectedData = [];
   const rawSelectItems = selectClause.split(",").map(item => item.trim());
 
   workingData.forEach((row) => {
     const projRow = {};
     rawSelectItems.forEach((item) => {
-      // Handle SELECT *
       if (item === "*") {
-        for (let key in row) {
-          // Remove prefix in table view for neatness
-          const viewKey = key.split(".")[1];
-          projRow[viewKey] = row[key];
-        }
+        for (let key in row) projRow[key.split(".")[1]] = row[key];
       } else {
-        // Handle aliases like `e.first_name AS name`
         const aliasMatch = item.match(/(.*?)\s+AS\s+(.*)/i);
-        let fieldName = item;
-        let finalColName = item;
-
-        if (aliasMatch) {
-          fieldName = aliasMatch[1].trim();
-          finalColName = aliasMatch[2].trim();
-        } else {
-          // Defaults name to end column name (e.g. e.salary -> salary)
-          const parts = item.split(".");
-          finalColName = parts[parts.length - 1];
-        }
-
+        let fieldName = aliasMatch ? aliasMatch[1].trim() : item;
+        let finalColName = aliasMatch ? aliasMatch[2].trim() : item.split(".").pop();
+        
         let val = row[fieldName];
         if (val === undefined) {
-          // Fallback if user didn't write alias in SELECT
           const fallbackKey = Object.keys(row).find((k) => k.endsWith(`.${fieldName}`));
           val = row[fallbackKey];
         }
-
-        if (val === undefined && !aliasMatch) {
-          throw new Error(`Unknown column '${fieldName}' in SELECT clause.`);
-        }
-
         projRow[finalColName] = val !== undefined ? val : null;
       }
     });
     projectedData.push(projRow);
   });
 
-  // 5. ORDER BY Sort
   if (orderByClause) {
     const orderParts = orderByClause.split(/\s+/);
     const sortField = orderParts[0].trim();
     const sortDirection = orderParts[1] ? orderParts[1].toUpperCase() : "ASC";
 
     projectedData.sort((a, b) => {
-      let valA = a[sortField];
-      let valB = b[sortField];
-
-      // Fallback if query specified table alias prefix in order clause, e.g. e.salary
-      if (valA === undefined) {
-        const cleanField = sortField.split(".").pop();
-        valA = a[cleanField];
-        valB = b[cleanField];
-      }
+      let valA = a[sortField] !== undefined ? a[sortField] : a[sortField.split(".").pop()];
+      let valB = b[sortField] !== undefined ? b[sortField] : b[sortField.split(".").pop()];
 
       if (valA === undefined || valA === null) return 1;
       if (valB === undefined || valB === null) return -1;
@@ -877,19 +838,12 @@ function executeMockQuery(queryStr, db) {
       if (typeof valA === "number" && typeof valB === "number") {
         return sortDirection === "DESC" ? valB - valA : valA - valB;
       }
-
-      return sortDirection === "DESC"
-        ? String(valB).localeCompare(String(valA))
-        : String(valA).localeCompare(String(valB));
+      return sortDirection === "DESC" ? String(valB).localeCompare(String(valA)) : String(valA).localeCompare(String(valB));
     });
   }
 
-  // 6. LIMIT slice
   if (limitClause) {
-    const lim = parseInt(limitClause, 10);
-    if (!isNaN(lim)) {
-      projectedData = projectedData.slice(0, lim);
-    }
+    projectedData = projectedData.slice(0, parseInt(limitClause, 10));
   }
 
   return projectedData;
@@ -899,170 +853,414 @@ function executeMockQuery(queryStr, db) {
    6. Interactive Quiz Engine
    ========================================================================== */
 function initQuiz() {
-  const quizQuestions = [
-    {
-      q: "Which SQL clause is used to filter query results based on aggregate functions?",
-      options: ["WHERE", "HAVING", "GROUP BY", "FILTER"],
-      answer: 1,
-      exp: "Aggregate values (like SUM, COUNT, AVG) are checked in the HAVING clause. The WHERE clause is executed before rows are aggregated, making it invalid for filtering grouped summaries."
-    },
-    {
-      q: "What is the key difference between UNION and UNION ALL?",
-      options: [
-        "UNION keeps duplicates, UNION ALL filters them.",
-        "UNION ALL automatically removes duplicates.",
-        "UNION removes duplicates, UNION ALL keeps duplicates (making it faster).",
-        "There is no difference in behavior."
-      ],
-      answer: 2,
-      exp: "UNION performs a sorting and deduplication pass over the output, removing duplicates. UNION ALL simply concatenates result sets together, bypassing deduplication and executing much faster."
-    },
-    {
-      q: "If an indexed column is wrapped in a function (e.g. WHERE YEAR(hire_date) = 2023), how does it affect query execution?",
-      options: [
-        "It speeds up execution because the dataset is pre-computed.",
-        "It makes the query non-sargable, preventing the database from using the index.",
-        "It causes an automatic syntax compiler crash.",
-        "Indexes cannot be used on date fields anyway."
-      ],
-      answer: 1,
-      exp: "Wrapping indexed columns in functions (like YEAR(), LOWER(), CONCAT()) invalidates index usage (makes it non-sargable). The database engine must scan the entire table, running the function on every row."
-    },
-    {
-      q: "Which Transaction Isolation Level is immune to Dirty Reads, Non-Repeatable Reads, and Phantom Reads?",
-      options: ["Read Committed", "Read Uncommitted", "Repeatable Read", "Serializable"],
-      answer: 3,
-      exp: "Serializable is the highest isolation level. It enforces strict lock policies, locking ranges of records to guarantee that concurrent transactions execute as if they were ordered sequentially."
-    },
-    {
-      q: "What does the expression COALESCE(salary, 0) evaluate to if the salary is NULL?",
-      options: ["Throws an error", "Returns NULL", "Returns 0", "Returns empty string"],
-      answer: 2,
-      exp: "COALESCE returns the first non-null argument in its parameter list. If 'salary' is null, it falls back to the second argument, which is 0."
-    },
-    {
-      q: "What happens if a NOT IN subquery returns even a single NULL value?",
-      options: [
-        "NULL values are skipped automatically.",
-        "The query errors out with a data exception.",
-        "The entire outer query evaluates to empty (zero rows).",
-        "It returns only rows that are not null."
-      ],
-      answer: 2,
-      exp: "Due to SQL's three-valued logic, comparing anything with NULL using NOT IN yields UNKNOWN. Since UNKNOWN is not TRUE, the query filters out all rows, resulting in an empty output. Use NOT EXISTS instead."
-    },
-    {
-      q: "Which window function assigns rankings where tie values get the same rank, and subsequent ranks skip sequence steps (e.g., 1, 2, 2, 4)?",
-      options: ["ROW_NUMBER()", "RANK()", "DENSE_RANK()", "LAG()"],
-      answer: 1,
-      exp: "RANK() assigns duplicate scores identical ranks, and skips downstream ranks. DENSE_RANK() ranks duplicate values identically but does not skip any ranks in the sequence."
-    }
-  ];
-
-  let currentQuestionIdx = 0;
-  let score = 0;
-  let hasAnswered = false;
-
   const quizArea = document.getElementById("quiz-area");
   if (!quizArea) return;
 
-  function loadQuestion() {
-    hasAnswered = false;
-    const qData = quizQuestions[currentQuestionIdx];
+  window.quizQuestions = [
+    { q: "Which SQL clause filters query results based on aggregate functions?", options: ["WHERE", "HAVING", "GROUP BY", "FILTER"], answer: 1, exp: "Aggregate metrics are checked in HAVING. WHERE filters rows before aggregation." },
+    { q: "What is the difference between UNION and UNION ALL?", options: ["UNION keeps duplicates.", "UNION ALL filters duplicates.", "UNION removes duplicates, UNION ALL keeps duplicates (faster).", "None."], answer: 2, exp: "UNION ALL skips sorting/deduplication, making it faster." },
+    { q: "If an indexed column is wrapped in a function, how does it affect execution?", options: ["It speeds up execution.", "It makes it non-sargable, preventing index usage.", "Syntax compiler crash.", "None."], answer: 1, exp: "Wrapping indexes in functions (like LOWER()) prevents index usage (non-sargable)." }
+  ];
 
-    const progressPercent = (currentQuestionIdx / quizQuestions.length) * 100;
+  let currentIdx = 0;
+  let score = 0;
+  let hasAnswered = false;
+
+  window.loadQuizQuestion = () => {
+    hasAnswered = false;
+    const qData = window.quizQuestions[currentIdx];
+    const progressPercent = (currentIdx / window.quizQuestions.length) * 100;
 
     quizArea.innerHTML = `
-      <div class="quiz-progress-bar">
-        <div class="quiz-progress" style="width: ${progressPercent}%;"></div>
-      </div>
-      <div class="quiz-meta">
-        <span>Question ${currentQuestionIdx + 1} of ${quizQuestions.length}</span>
-        <span>Score: ${score}</span>
-      </div>
+      <div class="quiz-progress-bar"><div class="quiz-progress" style="width: ${progressPercent}%;"></div></div>
+      <div class="quiz-meta"><span>Question ${currentIdx + 1} of ${window.quizQuestions.length}</span><span>Score: ${score}</span></div>
       <div class="quiz-question-box">
         <h3>${qData.q}</h3>
         <div class="quiz-options">
-          ${qData.options.map((opt, idx) => `
-            <button class="quiz-option" onclick="submitAnswer(${idx})">${opt}</button>
-          `).join("")}
+          ${qData.options.map((opt, idx) => `<button class="quiz-option" onclick="submitQuizAnswer(${idx})">${opt}</button>`).join("")}
         </div>
         <div id="quiz-feedback-box"></div>
       </div>
     `;
-  }
+  };
 
-  window.submitAnswer = (selectedIdx) => {
+  window.submitQuizAnswer = (selectedIdx) => {
     if (hasAnswered) return;
     hasAnswered = true;
 
-    const qData = quizQuestions[currentQuestionIdx];
+    const qData = window.quizQuestions[currentIdx];
     const options = document.querySelectorAll(".quiz-option");
     const feedbackBox = document.getElementById("quiz-feedback-box");
-
     const isCorrect = selectedIdx === qData.answer;
 
-    // Highlight choices
     options.forEach((opt, idx) => {
-      if (idx === qData.answer) {
-        opt.classList.add("correct");
-      } else if (idx === selectedIdx && !isCorrect) {
-        opt.classList.add("incorrect");
-      }
+      if (idx === qData.answer) opt.classList.add("correct");
+      else if (idx === selectedIdx && !isCorrect) opt.classList.add("incorrect");
     });
 
-    if (isCorrect) {
-      score++;
-    }
+    if (isCorrect) score++;
 
-    // Display explanation
     feedbackBox.innerHTML = `
       <div class="quiz-explanation">
         <h4>${isCorrect ? "🎉 Correct!" : "❌ Incorrect"}</h4>
         <p>${qData.exp}</p>
-        <button class="btn btn-primary" onclick="nextQuizStep()" style="margin-top: 15px; width: 100%; justify-content: center;">
-          ${currentQuestionIdx + 1 === quizQuestions.length ? "Finish Quiz" : "Next Question"} <i class="fa-solid fa-arrow-right"></i>
+        <button class="btn btn-primary" onclick="nextQuizStep()" style="margin-top: 10px; width:100%; justify-content:center;">
+          ${currentIdx + 1 === window.quizQuestions.length ? "Finish Quiz" : "Next Question"}
         </button>
       </div>
     `;
   };
 
   window.nextQuizStep = () => {
-    currentQuestionIdx++;
-    if (currentQuestionIdx < quizQuestions.length) {
-      loadQuestion();
-    } else {
-      showResults();
-    }
+    currentIdx++;
+    if (currentIdx < window.quizQuestions.length) window.loadQuizQuestion();
+    else showQuizResults();
   };
 
-  function showResults() {
-    const percent = Math.round((score / quizQuestions.length) * 100);
-    let message = "";
-
-    if (percent >= 90) message = "🏆 Outstanding! You are a SQL Master!";
-    else if (percent >= 70) message = "👏 Great job! You are interview-ready.";
-    else message = "📚 Keep learning and try again to improve your score.";
-
+  function showQuizResults() {
     quizArea.innerHTML = `
       <div class="glass-card quiz-results-card">
         <h2>Quiz Complete</h2>
-        <div class="score-circle">
-          <span class="score-num">${score}/${quizQuestions.length}</span>
-          <span class="score-label">${percent}% Correct</span>
-        </div>
-        <p style="font-size: 1.1rem;">${message}</p>
+        <div class="score-circle"><span class="score-num">${score}/${window.quizQuestions.length}</span></div>
         <button class="btn btn-primary" onclick="restartQuiz()"><i class="fa-solid fa-rotate-left"></i> Retake Quiz</button>
       </div>
     `;
   }
 
   window.restartQuiz = () => {
-    currentQuestionIdx = 0;
+    currentIdx = 0;
     score = 0;
-    loadQuestion();
+    window.loadQuizQuestion();
   };
 
-  // Trigger initial quiz question load
-  loadQuestion();
+  window.loadQuizQuestion();
+}
+
+/* ==========================================================================
+   7. Roadmap Timeline & Progress Tracking
+   ========================================================================== */
+function initRoadmap() {
+  const container = document.getElementById("roadmap-container");
+  if (!container) return;
+
+  // Load progress state from localStorage or initialize
+  window.roadmapProgress = JSON.parse(localStorage.getItem("sql_roadmap_progress")) || {};
+
+  window.renderRoadmap = () => {
+    container.innerHTML = window.ROADMAP_STAGES.map((stage, idx) => {
+      const stageTopics = stage.topics;
+      const completedCount = stageTopics.filter(t => window.roadmapProgress[t.id]).length;
+      const pct = Math.round((completedCount / stageTopics.length) * 100) || 0;
+
+      return `
+        <div class="glass-card roadmap-stage-card ${pct === 100 ? "completed" : ""}" style="margin-bottom: 2rem; position: relative;">
+          <div class="stage-header" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
+            <div>
+              <h3 style="color: var(--accent-cyan); font-size: 1.3rem;">${stage.title}</h3>
+              <span class="tag tag-company" style="margin-top:4px; display:inline-block;">${stage.duration}</span>
+            </div>
+            <div style="text-align:right;">
+              <span style="font-weight:700; color: var(--accent-pink);">${pct}% Done</span>
+            </div>
+          </div>
+          <div class="quiz-progress-bar" style="margin-bottom: 1.5rem;"><div class="quiz-progress" style="width: ${pct}%;"></div></div>
+          
+          <ul style="list-style:none; display:flex; flex-direction:column; gap:12px;">
+            ${stageTopics.map(t => `
+              <li style="display:flex; justify-content:space-between; align-items:center; border-bottom: 1px dashed rgba(255,255,255,0.05); padding-bottom:8px;">
+                <label style="display:flex; align-items:center; gap:10px; cursor:pointer;">
+                  <input type="checkbox" style="width:18px; height:18px; accent-color: var(--accent-purple);" 
+                    ${window.roadmapProgress[t.id] ? "checked" : ""} 
+                    onchange="toggleRoadmapTopic('${t.id}')">
+                  <span>${t.name}</span>
+                </label>
+                <div style="display:flex; gap:8px;">
+                  <button class="q-copy-btn" style="padding: 2px 8px; font-size:0.75rem;" onclick="navigateToSyllabusTopic('${t.module}')">Syllabus</button>
+                  <button class="q-copy-btn" style="padding: 2px 8px; font-size:0.75rem;" onclick="filterQuestionsByTopic('${t.questions.join(",")}')">MNC Qs</button>
+                </div>
+              </li>
+            `).join("")}
+          </ul>
+        </div>
+      `;
+    }).join("");
+
+    updateOverallProgress();
+  };
+
+  window.toggleRoadmapTopic = (topicId) => {
+    window.roadmapProgress[topicId] = !window.roadmapProgress[topicId];
+    localStorage.setItem("sql_roadmap_progress", JSON.stringify(window.roadmapProgress));
+    window.renderRoadmap();
+  };
+
+  window.navigateToSyllabusTopic = (moduleId) => {
+    window.navigateTo("syllabus");
+    window.displayTopic(moduleId);
+    const sidebar = document.getElementById("syllabus-sidebar");
+    if (sidebar) {
+      sidebar.querySelectorAll(".topic-btn").forEach((btn) => {
+        if (btn.getAttribute("data-id") === moduleId) btn.classList.add("active");
+        else btn.classList.remove("active");
+      });
+    }
+  };
+
+  window.filterQuestionsByTopic = (qIdsStr) => {
+    window.navigateTo("questions");
+    const qIds = qIdsStr.split(",").map(Number);
+    window.filteredQuestions = window.SQL_QUESTIONS.filter(q => qIds.includes(q.id));
+    // Trigger render questions in questions module
+    window.changePage(1);
+  };
+
+  function updateOverallProgress() {
+    const totalTopics = window.ROADMAP_STAGES.flatMap(s => s.topics).length;
+    const completedCount = Object.values(window.roadmapProgress).filter(Boolean).length;
+    const pct = Math.round((completedCount / totalTopics) * 100) || 0;
+
+    const overallBar = document.getElementById("overall-roadmap-progress");
+    const overallText = document.getElementById("overall-roadmap-text");
+    if (overallBar && overallText) {
+      overallBar.style.width = `${pct}%`;
+      overallText.innerText = `${pct}% Overall Learning Path Completed (${completedCount}/${totalTopics} topics)`;
+    }
+  }
+
+  window.renderRoadmap();
+}
+
+/* ==========================================================================
+   8. Resource Hub
+   ========================================================================== */
+function initResourceHub() {
+  const container = document.getElementById("resources-grid");
+  if (!container) return;
+
+  window.renderResources = (category = "all") => {
+    const list = category === "all" ? window.RESOURCES : window.RESOURCES.filter(r => r.category === category);
+
+    container.innerHTML = list.map(r => `
+      <div class="glass-card resource-card" style="display:flex; flex-direction:column; gap:10px; justify-content:space-between; height: 100%;">
+        <div>
+          <span class="tag tag-company" style="text-transform:uppercase; font-size:0.7rem; color: var(--accent-cyan);">${r.category}</span>
+          <h3 style="font-size:1.1rem; margin-top:5px;">${r.title}</h3>
+          <p style="font-size:0.85rem; color: var(--text-muted); margin-top:5px;">${r.desc}</p>
+        </div>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-top:10px; border-top:1px dashed rgba(255,255,255,0.05); padding-top:10px;">
+          <span style="font-size:0.75rem; color: var(--accent-pink);">${r.level}</span>
+          <a href="${r.url}" target="_blank" class="btn" style="padding:4px 10px; font-size:0.8rem; border-color: var(--accent-purple);">Open <i class="fa-solid fa-arrow-up-right-from-square"></i></a>
+        </div>
+      </div>
+    `).join("");
+  };
+
+  const chips = document.querySelectorAll(".resource-chip");
+  chips.forEach(chip => {
+    chip.addEventListener("click", () => {
+      chips.forEach(c => c.classList.remove("active"));
+      chip.classList.add("active");
+      window.renderResources(chip.getAttribute("data-category"));
+    });
+  });
+
+  window.renderResources("all");
+}
+
+/* ==========================================================================
+   9. Goal-Based Recommendation Engine
+   ========================================================================== */
+function initRecommendationEngine() {
+  const submitBtn = document.getElementById("submit-recommendation");
+  const resultsCard = document.getElementById("recommendation-results");
+
+  if (!submitBtn || !resultsCard) return;
+
+  // Single-select button selection logic
+  document.querySelectorAll(".questionnaire-group").forEach(group => {
+    const btns = group.querySelectorAll(".btn");
+    btns.forEach(btn => {
+      btn.addEventListener("click", () => {
+        btns.forEach(b => b.classList.remove("btn-primary"));
+        btn.classList.add("btn-primary");
+      });
+    });
+  });
+
+  submitBtn.addEventListener("click", () => {
+    const selectedGoalBtn = document.querySelector("#group-goal .btn-primary");
+    const selectedLevelBtn = document.querySelector("#group-level .btn-primary");
+    const selectedTimeBtn = document.querySelector("#group-time .btn-primary");
+
+    if (!selectedGoalBtn || !selectedLevelBtn || !selectedTimeBtn) {
+      alert("Please select an option for all three questions.");
+      return;
+    }
+
+    const goal = selectedGoalBtn.getAttribute("data-val");
+    const level = selectedLevelBtn.getAttribute("data-val");
+    const time = selectedTimeBtn.getAttribute("data-val");
+
+    // Fetch rule output
+    const rule = window.RECOMMENDATION_RULES[goal] || window.RECOMMENDATION_RULES["beginner"];
+
+    const stageTitles = rule.order.map(stageId => {
+      const stage = window.ROADMAP_STAGES.find(s => s.id === stageId);
+      return stage ? stage.title : "";
+    });
+
+    const recommendedResourcesList = window.RESOURCES.filter(r => rule.resources.includes(r.id));
+
+    resultsCard.innerHTML = `
+      <div class="glass-card" style="margin-top:2rem; animation: fadeIn 0.5s ease-out;">
+        <h3 style="color: var(--accent-cyan); font-size:1.3rem; margin-bottom:1rem;"><i class="fa-solid fa-map-location-dot"></i> Your Custom SQL Learning Path</h3>
+        <p style="font-size:0.95rem; color: var(--text-muted); margin-bottom:1.5rem;">Based on your goal, we have calculated a sequential roadmap focusing on the key SQL skills you need:</p>
+        
+        <div style="margin-bottom:1.5rem;">
+          <h4 style="font-size:1rem; color: var(--accent-pink); margin-bottom:0.5rem;">1. Recommended Stages Order</h4>
+          <ol style="padding-left:1.5rem;">
+            ${stageTitles.map(title => `<li style="margin-bottom:4px;">${title}</li>`).join("")}
+          </ol>
+        </div>
+
+        <div style="margin-bottom:1.5rem;">
+          <h4 style="font-size:1rem; color: var(--accent-pink); margin-bottom:0.5rem;">2. Recommended Resources</h4>
+          <div style="display:flex; flex-direction:column; gap:8px;">
+            ${recommendedResourcesList.map(r => `
+              <div style="font-size:0.85rem; border-left: 3px solid var(--accent-purple); padding-left:10px;">
+                <strong>${r.title}</strong> (${r.level}) - <a href="${r.url}" target="_blank">Open Link</a>
+              </div>
+            `).join("")}
+          </div>
+        </div>
+
+        <div style="margin-bottom:1.5rem;">
+          <h4 style="font-size:1rem; color: var(--accent-pink); margin-bottom:0.5rem;">3. Weekly Milestone Plan</h4>
+          <ul style="list-style:none; display:flex; flex-direction:column; gap:6px;">
+            ${rule.milestones.map(m => `<li style="font-size:0.9rem; padding-left:15px; position:relative;"><i class="fa-solid fa-calendar-week" style="position:absolute; left:0; top:4px; font-size:0.75rem; color: var(--accent-cyan);"></i> ${m}</li>`).join("")}
+          </ul>
+        </div>
+
+        <button class="btn btn-primary" onclick="startCustomPath('${rule.order.join(",")}')" style="width:100%; justify-content:center;">
+          Start This Path Now <i class="fa-solid fa-circle-play"></i>
+        </button>
+      </div>
+    `;
+  });
+
+  window.startCustomPath = (stagesOrderStr) => {
+    // Navigate to Roadmap page
+    window.navigateTo("roadmap");
+    // Show user a message about their tailored roadmap
+    const overallText = document.getElementById("overall-roadmap-text");
+    if (overallText) {
+      overallText.innerText += " (Tailored to your goal)";
+    }
+  };
+}
+
+/* ==========================================================================
+   10. Administrative Forms setup (dynamic session data update)
+   ========================================================================== */
+function setupAdminForms() {
+  // 1. Add Question Form
+  const addQBtn = document.getElementById("admin-add-question-btn");
+  if (addQBtn) {
+    addQBtn.addEventListener("click", () => {
+      const title = document.getElementById("admin-q-title").value;
+      const difficulty = document.getElementById("admin-q-diff").value;
+      const category = document.getElementById("admin-q-cat").value;
+      const companiesStr = document.getElementById("admin-q-companies").value;
+      const problem = document.getElementById("admin-q-problem").value;
+      const solution = document.getElementById("admin-q-solution").value;
+      const explanation = document.getElementById("admin-q-explanation").value;
+
+      if (!title || !problem || !solution) {
+        alert("Please fill in Title, Problem Statement, and SQL Solution.");
+        return;
+      }
+
+      const newQ = {
+        id: window.SQL_QUESTIONS.length + 1,
+        title: title,
+        difficulty: difficulty,
+        category: category,
+        companies: companiesStr.split(",").map(c => c.trim()).filter(Boolean),
+        problem: problem,
+        schema: "",
+        solution: solution,
+        explanation: explanation || "Custom submitted interview challenge."
+      };
+
+      window.SQL_QUESTIONS.push(newQ);
+      alert(`Question #${newQ.id} added successfully!`);
+      // Trigger render updates
+      initMNCQuestions();
+      // Clear inputs
+      document.querySelectorAll(".admin-input-q").forEach(el => el.value = "");
+    });
+  }
+
+  // 2. Add Quiz Form
+  const addQuizBtn = document.getElementById("admin-add-quiz-btn");
+  if (addQuizBtn) {
+    addQuizBtn.addEventListener("click", () => {
+      const q = document.getElementById("admin-quiz-q").value;
+      const opt0 = document.getElementById("admin-quiz-opt0").value;
+      const opt1 = document.getElementById("admin-quiz-opt1").value;
+      const opt2 = document.getElementById("admin-quiz-opt2").value;
+      const opt3 = document.getElementById("admin-quiz-opt3").value;
+      const answer = parseInt(document.getElementById("admin-quiz-ans").value, 10);
+      const exp = document.getElementById("admin-quiz-exp").value;
+
+      if (!q || !opt0 || !opt1) {
+        alert("Please write the question and at least two options.");
+        return;
+      }
+
+      const newQuiz = {
+        q: q,
+        options: [opt0, opt1, opt2, opt3].filter(Boolean),
+        answer: answer,
+        exp: exp || "Conceptual quiz challenge."
+      };
+
+      window.quizQuestions.push(newQuiz);
+      alert("Quiz question added successfully!");
+      initQuiz(); // reload quiz questions
+      // Clear inputs
+      document.querySelectorAll(".admin-input-quiz").forEach(el => el.value = "");
+    });
+  }
+
+  // 3. Add Resource Form
+  const addResBtn = document.getElementById("admin-add-res-btn");
+  if (addResBtn) {
+    addResBtn.addEventListener("click", () => {
+      const title = document.getElementById("admin-res-title").value;
+      const category = document.getElementById("admin-res-cat").value;
+      const desc = document.getElementById("admin-res-desc").value;
+      const level = document.getElementById("admin-res-level").value;
+      const url = document.getElementById("admin-res-url").value;
+
+      if (!title || !url) {
+        alert("Please specify the Title and Outbound URL link.");
+        return;
+      }
+
+      const newRes = {
+        id: window.RESOURCES.length + 1,
+        category: category,
+        title: title,
+        desc: desc || "Reference link.",
+        level: level,
+        url: url
+      };
+
+      window.RESOURCES.push(newRes);
+      alert("Resource reference added successfully!");
+      initResourceHub();
+      document.querySelectorAll(".admin-input-res").forEach(el => el.value = "");
+    });
+  }
 }

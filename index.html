@@ -3,11 +3,93 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SQL Mastery Hub | Deep Topics, 70 MNC Questions & Playground</title>
-  <meta name="description" content="Master SQL deeply with 10 detailed learning modules, 70 frequently asked MNC interview questions, common beginner mistakes, interview tips, and an interactive query simulator.">
+  <title>SQL Mastery Hub | Guided Roadmap & Live Sandbox</title>
+  <meta name="description" content="A complete self-paced platform to learn SQL. Includes stage-based Roadmap progress tracking, 17 detailed modules, 70 MNC questions, a Resource Hub, and an interactive query simulator.">
   <link rel="stylesheet" href="style.css">
   <!-- FontAwesome for UI Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    /* Styling extension for upgraded v2 features */
+    .roadmap-stage-card.completed {
+      border-color: var(--accent-cyan);
+      box-shadow: 0 0 10px rgba(6, 182, 212, 0.15) inset;
+    }
+    .questionnaire-group {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 1.5rem;
+    }
+    .questionnaire-group .btn {
+      padding: 0.5rem 1.2rem;
+      border-radius: 20px;
+      background: var(--bg-secondary);
+      border: 1px solid var(--glass-border);
+      color: var(--text-muted);
+    }
+    .questionnaire-group .btn.btn-primary {
+      color: var(--text-main);
+      border-color: var(--accent-purple);
+      box-shadow: var(--shadow-neon);
+    }
+    .resource-chips-container {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 1.5rem;
+      flex-wrap: wrap;
+    }
+    .resource-chip {
+      background: var(--bg-secondary);
+      border: 1px solid var(--glass-border);
+      color: var(--text-muted);
+      padding: 6px 16px;
+      border-radius: 20px;
+      cursor: pointer;
+      font-size: 0.85rem;
+      font-weight: 600;
+      transition: var(--transition);
+    }
+    .resource-chip.active, .resource-chip:hover {
+      border-color: var(--accent-cyan);
+      color: var(--text-main);
+      background: rgba(6, 182, 212, 0.15);
+    }
+    .resources-layout-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1.5rem;
+    }
+    /* Admin Form Styling */
+    .admin-form-section {
+      margin-top: 3rem;
+      border-top: 1px dashed var(--glass-border);
+      padding-top: 2rem;
+    }
+    .admin-form-section h3 {
+      font-size: 1.3rem;
+      color: var(--accent-cyan);
+      margin-bottom: 1rem;
+    }
+    .admin-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+    .admin-input {
+      width: 100%;
+      background: var(--bg-secondary);
+      border: 1px solid var(--glass-border);
+      color: var(--text-main);
+      padding: 8px 12px;
+      border-radius: 6px;
+      outline: none;
+      font-family: var(--font-sans);
+    }
+    .admin-input:focus {
+      border-color: var(--accent-purple);
+    }
+  </style>
 </head>
 <body>
 
@@ -21,14 +103,15 @@
     <header>
       <div class="logo" data-navigate="home">
         <i class="fa-solid fa-atom"></i> SQL Mastery Hub
-        <span class="logo-sub">Gravity Engine</span>
+        <span class="logo-sub">Super Site</span>
       </div>
       <nav>
         <button class="nav-link" data-target="home"><i class="fa-solid fa-house"></i> Home</button>
+        <button class="nav-link" data-target="roadmap"><i class="fa-solid fa-map-location-dot"></i> Roadmap</button>
         <button class="nav-link" data-target="syllabus"><i class="fa-solid fa-book-open"></i> Learn SQL</button>
         <button class="nav-link" data-target="questions"><i class="fa-solid fa-clipboard-question"></i> 70 MNC Qs</button>
-        <button class="nav-link" data-target="mistakes"><i class="fa-solid fa-triangle-exclamation"></i> Mistakes</button>
-        <button class="nav-link" data-target="tips"><i class="fa-solid fa-lightbulb"></i> Tips</button>
+        <button class="nav-link" data-target="resources"><i class="fa-solid fa-cubes"></i> Resources</button>
+        <button class="nav-link" data-target="path_finder"><i class="fa-solid fa-compass"></i> Path Finder</button>
         <button class="nav-link" data-target="simulator"><i class="fa-solid fa-terminal"></i> Simulator</button>
         <button class="nav-link" data-target="quiz"><i class="fa-solid fa-graduation-cap"></i> Quiz</button>
       </nav>
@@ -40,42 +123,55 @@
       <!-- SECTION 1: HOME PAGE -->
       <section id="home" class="app-section">
         <div class="hero-section">
-          <h1 class="hero-title">Master SQL with Gravity</h1>
-          <p class="hero-subtitle">Learn database querying deeply. Study 70 highly requested MNC interview questions, discover and avoid critical beginner mistakes, and run queries in real-time inside the interactive playground simulator.</p>
+          <h1 class="hero-title">Self-Paced SQL Mastery Platform</h1>
+          <p class="hero-subtitle">Track your learning via our guided stage-based Roadmap, run query simulations against custom and mini-project tables, and generate tailored study schedules.</p>
           <div class="hero-buttons">
-            <button class="btn btn-primary" data-navigate="syllabus"><i class="fa-solid fa-rocket"></i> Start Learning</button>
-            <button class="btn" data-navigate="simulator"><i class="fa-solid fa-terminal"></i> Open SQL Simulator</button>
+            <button class="btn btn-primary" data-navigate="roadmap"><i class="fa-solid fa-map-location-dot"></i> Open Roadmap</button>
+            <button class="btn" data-navigate="path_finder"><i class="fa-solid fa-compass"></i> Customize My Path</button>
           </div>
 
           <div class="hero-features">
-            <div class="glass-card feature-card" data-navigate="syllabus">
-              <div class="feature-icon"><i class="fa-solid fa-graduation-cap"></i></div>
-              <h3>Deep Syllabus</h3>
-              <p>Explore DDL, joins, subqueries, CTEs, window functions, and indexing optimization.</p>
+            <div class="glass-card feature-card" data-navigate="roadmap">
+              <div class="feature-icon"><i class="fa-solid fa-map-location-dot"></i></div>
+              <h3>Roadmap Journey</h3>
+              <p>Work through 10 stages with checklist tracking, overall completion rates, and navigation links.</p>
             </div>
             
-            <div class="glass-card feature-card" data-navigate="questions">
-              <div class="feature-icon"><i class="fa-solid fa-clipboard-question"></i></div>
-              <h3>70 MNC Qs</h3>
-              <p>Solve 70 real questions asked at Google, Amazon, and Meta, filtered by difficulty and company tags.</p>
-            </div>
-
-            <div class="glass-card feature-card" data-navigate="mistakes">
-              <div class="feature-icon"><i class="fa-solid fa-code-compare"></i></div>
-              <h3>Beginner Mistakes</h3>
-              <p>Avoid anti-patterns, understand null anomalies, and view bad vs. good side-by-side code diffs.</p>
+            <div class="glass-card feature-card" data-navigate="syllabus">
+              <div class="feature-icon"><i class="fa-solid fa-book-open"></i></div>
+              <h3>17 Library Modules</h3>
+              <p>Explore DDL, Window calculations, indexes, transaction isolations, JSON query functions, and dialects.</p>
             </div>
 
             <div class="glass-card feature-card" data-navigate="simulator">
               <div class="feature-icon"><i class="fa-solid fa-terminal"></i></div>
-              <h3>Live SQL Editor</h3>
-              <p>Interact with our sandbox schema using real queries directly in your browser.</p>
+              <h3>Case Studies & DDL</h3>
+              <p>Analyze Swiggy, Rapido, Amazon & Spotify databases, or create your own custom schemas.</p>
+            </div>
+
+            <div class="glass-card feature-card" data-navigate="resources">
+              <div class="feature-icon"><i class="fa-solid fa-cubes"></i></div>
+              <h3>Reference Hub</h3>
+              <p>Access curated books, cheat sheets, official manuals, and practice sandboxes.</p>
             </div>
           </div>
         </div>
       </section>
 
-      <!-- SECTION 2: LEARNING SYLLABUS -->
+      <!-- SECTION 2: ROADMAP TIMELINE -->
+      <section id="roadmap" class="app-section" style="display: none;">
+        <div class="glass-card" style="margin-bottom: 2rem;">
+          <h2 style="font-size: 1.8rem; margin-bottom: 0.5rem;"><i class="fa-solid fa-map-location-dot"></i> Guided SQL Learning Pathway</h2>
+          <p style="color: var(--text-muted); margin-bottom: 1rem;" id="overall-roadmap-text">0% Overall Learning Path Completed (0/29 topics)</p>
+          <div class="quiz-progress-bar"><div class="quiz-progress" id="overall-roadmap-progress" style="width: 0%;"></div></div>
+        </div>
+
+        <div id="roadmap-container">
+          <!-- Populated via Javascript -->
+        </div>
+      </section>
+
+      <!-- SECTION 3: LEARNING SYLLABUS -->
       <section id="syllabus" class="app-section" style="display: none;">
         <h2 style="font-size: 2rem; margin-bottom: 1.5rem;"><i class="fa-solid fa-book-open"></i> SQL Deep Dive Modules</h2>
         <div class="syllabus-layout">
@@ -90,7 +186,7 @@
         </div>
       </section>
 
-      <!-- SECTION 3: 70 MNC QUESTIONS -->
+      <!-- SECTION 4: 70 MNC QUESTIONS -->
       <section id="questions" class="app-section" style="display: none;">
         <h2 style="font-size: 2rem; margin-bottom: 1.5rem;"><i class="fa-solid fa-clipboard-question"></i> 70 MNC Interview Questions</h2>
         <div class="questions-layout">
@@ -100,9 +196,7 @@
               <i class="fa-solid fa-magnifying-glass"></i>
               <input type="text" id="q-search" class="search-input" placeholder="Search questions or problem keywords...">
             </div>
-            
             <div class="filter-group">
-              <label for="q-filter-difficulty" style="font-size: 0.9rem; font-weight: 600;">Difficulty:</label>
               <select id="q-filter-difficulty" class="filter-select">
                 <option value="all">All Difficulties</option>
                 <option value="easy">Easy</option>
@@ -110,83 +204,151 @@
                 <option value="hard">Hard</option>
               </select>
             </div>
-
             <div class="filter-group">
-              <label for="q-filter-category" style="font-size: 0.9rem; font-weight: 600;">Category:</label>
-              <select id="q-filter-category" class="filter-select">
-                <!-- Populated via Javascript -->
-              </select>
+              <select id="q-filter-category" class="filter-select"></select>
             </div>
-
             <div class="filter-group">
-              <label for="q-filter-company" style="font-size: 0.9rem; font-weight: 600;">Company:</label>
-              <select id="q-filter-company" class="filter-select">
-                <!-- Populated via Javascript -->
-              </select>
+              <select id="q-filter-company" class="filter-select"></select>
             </div>
           </div>
 
           <!-- Questions List -->
-          <div class="questions-list" id="questions-container">
-            <!-- Populated via Javascript -->
+          <div class="questions-list" id="questions-container"></div>
+          <div class="pagination-container" id="q-pagination"></div>
+
+          <!-- Admin Panel to Add Question -->
+          <div class="glass-card admin-form-section">
+            <h3><i class="fa-solid fa-folder-plus"></i> Add Custom Interview Question</h3>
+            <div class="admin-grid">
+              <input type="text" id="admin-q-title" class="admin-input admin-input-q" placeholder="Question Title">
+              <select id="admin-q-diff" class="admin-input admin-input-q">
+                <option value="Easy">Easy</option>
+                <option value="Medium">Medium</option>
+                <option value="Hard">Hard</option>
+              </select>
+              <input type="text" id="admin-q-cat" class="admin-input admin-input-q" placeholder="Category (e.g. Joins)">
+              <input type="text" id="admin-q-companies" class="admin-input admin-input-q" placeholder="Target Companies (comma-separated)">
+            </div>
+            <textarea id="admin-q-problem" class="admin-input admin-input-q" style="height: 80px; margin-bottom: 12px;" placeholder="Problem Statement Description"></textarea>
+            <textarea id="admin-q-solution" class="admin-input admin-input-q" style="height: 80px; margin-bottom: 12px; font-family: monospace;" placeholder="SQL Query Solution"></textarea>
+            <textarea id="admin-q-explanation" class="admin-input admin-input-q" style="height: 60px; margin-bottom: 12px;" placeholder="Solution Logic Explanation"></textarea>
+            <button class="btn btn-primary" id="admin-add-question-btn">Publish Question</button>
           </div>
 
-          <!-- Pagination -->
-          <div class="pagination-container" id="q-pagination">
-            <!-- Populated via Javascript -->
+        </div>
+      </section>
+
+      <!-- SECTION 5: RESOURCE HUB -->
+      <section id="resources" class="app-section" style="display: none;">
+        <h2 style="font-size: 2rem; margin-bottom: 1.5rem;"><i class="fa-solid fa-cubes"></i> SQL Reference & Resource Library</h2>
+        
+        <div class="resource-chips-container">
+          <span class="resource-chip active" data-category="all">All Items</span>
+          <span class="resource-chip" data-category="courses">Free Courses</span>
+          <span class="resource-chip" data-category="platforms">Practice Platforms</span>
+          <span class="resource-chip" data-category="docs">Official Documentation</span>
+          <span class="resource-chip" data-category="books">SQL Books</span>
+        </div>
+
+        <div class="resources-layout-grid" id="resources-grid">
+          <!-- Populated via Javascript -->
+        </div>
+
+        <!-- Admin Form to Add Resource -->
+        <div class="glass-card admin-form-section">
+          <h3><i class="fa-solid fa-circle-plus"></i> Submit Outbound Resource Link</h3>
+          <div class="admin-grid">
+            <input type="text" id="admin-res-title" class="admin-input admin-input-res" placeholder="Resource Title">
+            <select id="admin-res-cat" class="admin-input admin-input-res">
+              <option value="courses">Free Courses</option>
+              <option value="platforms">Practice Platforms</option>
+              <option value="docs">Official Documentation</option>
+              <option value="books">SQL Books</option>
+            </select>
+            <input type="text" id="admin-res-level" class="admin-input admin-input-res" placeholder="Skill Level Target (e.g. Beginner)">
+            <input type="text" id="admin-res-url" class="admin-input admin-input-res" placeholder="Outbound URL Link">
           </div>
+          <input type="text" id="admin-res-desc" class="admin-input admin-input-res" style="margin-bottom:12px;" placeholder="Brief resource description">
+          <button class="btn btn-primary" id="admin-add-res-btn">Publish Resource</button>
         </div>
       </section>
 
-      <!-- SECTION 4: BEGINNER MISTAKES -->
-      <section id="mistakes" class="app-section" style="display: none;">
-        <h2 style="font-size: 2rem; margin-bottom: 1.5rem;"><i class="fa-solid fa-triangle-exclamation"></i> SQL Anti-Patterns & Beginner Mistakes</h2>
-        <p style="color: var(--text-muted); margin-bottom: 2rem; max-width: 800px;">Writing correct SQL means understanding the subtle rules of the language. Below are 6 of the most common beginner mistakes, anti-patterns, and NULL behavior anomalies with concrete side-by-side solutions.</p>
-        <div class="mistakes-grid" id="mistakes-list">
-          <!-- Populated via Javascript -->
+      <!-- SECTION 6: PATH FINDER RECOMMENDATIONS -->
+      <section id="path_finder" class="app-section" style="display: none;">
+        <h2 style="font-size: 2rem; margin-bottom: 1.5rem;"><i class="fa-solid fa-compass"></i> Find My Custom SQL Path</h2>
+        <div class="glass-card">
+          <p style="color: var(--text-muted); margin-bottom: 2rem;">Answer these three quick questions to calculate a personalized learning roadmap with tailored milestones and resource suggestions.</p>
+          
+          <div class="questionnaire-box">
+            <div id="group-goal">
+              <h4 style="margin-bottom: 8px;">What is your primary goal?</h4>
+              <div class="questionnaire-group">
+                <button class="btn btn-primary" data-val="beginner">Complete Beginner</button>
+                <button class="btn" data-val="interview">Interview Prep (FAANG/MNC)</button>
+                <button class="btn" data-val="analyst">Data Analyst Career</button>
+                <button class="btn" data-val="developer">Backend Developer Career</button>
+              </div>
+            </div>
+
+            <div id="group-level">
+              <h4 style="margin-bottom: 8px;">What is your current SQL skill level?</h4>
+              <div class="questionnaire-group">
+                <button class="btn btn-primary" data-val="new">New to SQL</button>
+                <button class="btn" data-val="basics">Know the Basics</button>
+                <button class="btn" data-val="comfort">Comfortable (want Advanced)</button>
+              </div>
+            </div>
+
+            <div id="group-time">
+              <h4 style="margin-bottom: 8px;">What is your weekly time budget?</h4>
+              <div class="questionnaire-group">
+                <button class="btn btn-primary" data-val="low">&lt; 3 hours</button>
+                <button class="btn" data-val="med">3 - 6 hours</button>
+                <button class="btn" data-val="high">6+ hours</button>
+              </div>
+            </div>
+
+            <button class="btn btn-primary" id="submit-recommendation" style="width: 100%; justify-content: center; padding: 12px; margin-top: 1rem;">
+              Calculate My Pathway <i class="fa-solid fa-gears"></i>
+            </button>
+          </div>
+
+          <div id="recommendation-results"></div>
         </div>
       </section>
 
-      <!-- SECTION 5: INTERVIEW TIPS -->
-      <section id="tips" class="app-section" style="display: none;">
-        <h2 style="font-size: 2rem; margin-bottom: 1.5rem;"><i class="fa-solid fa-lightbulb"></i> SQL Interview Strategies & Cheat Sheet</h2>
-        <p style="color: var(--text-muted); margin-bottom: 2rem; max-width: 800px;">When coding SQL during an interview, your logic and structure matter just as much as writing the correct syntax. Follow this systematic approach to excel in your technical interviews.</p>
-        <div class="tips-layout" id="tips-list-container">
-          <!-- Populated via Javascript -->
-        </div>
-      </section>
-
-      <!-- SECTION 6: SQL PLAYGROUND SIMULATOR -->
+      <!-- SECTION 7: SQL PLAYGROUND SIMULATOR -->
       <section id="simulator" class="app-section" style="display: none;">
-        <h2 style="font-size: 2rem; margin-bottom: 1.5rem;"><i class="fa-solid fa-terminal"></i> Interactive SQL Playground</h2>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;">
+          <h2 style="font-size: 2rem;"><i class="fa-solid fa-terminal"></i> Interactive SQL Sandbox</h2>
+          
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <label for="project-select" style="font-size: 0.9rem; font-weight: 700; color: var(--accent-cyan);">Load Case Study:</label>
+            <select id="project-select" class="filter-select">
+              <option value="none">Default Database</option>
+              <option value="swiggy">Swiggy (Food Delivery)</option>
+              <option value="rapido">Rapido (Ride Hailing)</option>
+              <option value="amazon">Amazon (E-Commerce)</option>
+              <option value="spotify">Spotify (Music Streaming)</option>
+            </select>
+          </div>
+        </div>
+
         <div class="simulator-layout">
-          <!-- Left schema reference panel -->
-          <div class="schema-panel">
-            <div class="glass-card schema-card">
-              <h4>employees <i class="fa-solid fa-table"></i></h4>
-              <ul class="schema-fields">
-                <li><span>emp_id (PK)</span> <span>INT</span></li>
-                <li><span>first_name</span> <span>VARCHAR</span></li>
-                <li><span>last_name</span> <span>VARCHAR</span></li>
-                <li><span>dept_id (FK)</span> <span>INT</span></li>
-                <li><span>salary</span> <span>INT</span></li>
-                <li><span>hire_date</span> <span>DATE</span></li>
-              </ul>
+          <!-- Schema sidebar panel -->
+          <div>
+            <div id="simulator-schema-panel">
+              <!-- Populated via Javascript -->
             </div>
-            
-            <div class="glass-card schema-card">
-              <h4>departments <i class="fa-solid fa-table"></i></h4>
-              <ul class="schema-fields">
-                <li><span>dept_id (PK)</span> <span>INT</span></li>
-                <li><span>dept_name</span> <span>VARCHAR</span></li>
-                <li><span>location</span> <span>VARCHAR</span></li>
-              </ul>
-            </div>
+            <div id="project-challenges" style="margin-top: 1.5rem;"></div>
           </div>
 
-          <!-- Right query runner editor -->
+          <!-- Query editor panel -->
           <div class="query-editor-wrapper">
             <div class="glass-card">
+              <div style="font-size:0.8rem; color:var(--text-muted); margin-bottom:8px;">
+                💡 Simulator supports: <code>CREATE TABLE</code>, <code>INSERT INTO</code>, and standard <code>SELECT</code> (with JOIN, WHERE, ORDER BY, LIMIT).
+              </div>
               <div class="textarea-container">
                 <textarea id="sql-query" class="sql-textarea" spellcheck="false"></textarea>
               </div>
@@ -194,20 +356,49 @@
                 <button class="btn btn-primary" id="run-sql"><i class="fa-solid fa-play"></i> Run Query</button>
               </div>
             </div>
-
-            <div class="terminal-result" id="console-result">
-              <span style="color: var(--text-muted);">Run the default query above, or edit it to query employee and department statistics.</span>
-            </div>
+            <div class="terminal-result" id="console-result"></div>
           </div>
         </div>
       </section>
 
-      <!-- SECTION 7: TAKE QUIZ -->
+      <!-- SECTION 8: TAKE QUIZ & ADMIN ADD -->
       <section id="quiz" class="app-section" style="display: none;">
         <h2 style="font-size: 2rem; margin-bottom: 1.5rem; text-align: center;"><i class="fa-solid fa-graduation-cap"></i> SQL Knowledge Check Quiz</h2>
-        <div class="glass-card quiz-container" id="quiz-area">
-          <!-- Populated via Javascript -->
+        
+        <div class="glass-card quiz-container" id="quiz-area"></div>
+
+        <!-- Admin Form to Add Quiz Question -->
+        <div class="glass-card quiz-container admin-form-section" style="margin-top:3rem;">
+          <h3><i class="fa-solid fa-folder-plus"></i> Add Custom Quiz Question</h3>
+          <input type="text" id="admin-quiz-q" class="admin-input admin-input-quiz" style="margin-bottom:12px;" placeholder="Write Question Prompt">
+          <div class="admin-grid" style="grid-template-columns: repeat(2, 1fr);">
+            <input type="text" id="admin-quiz-opt0" class="admin-input admin-input-quiz" placeholder="Option A">
+            <input type="text" id="admin-quiz-opt1" class="admin-input admin-input-quiz" placeholder="Option B">
+            <input type="text" id="admin-quiz-opt2" class="admin-input admin-input-quiz" placeholder="Option C">
+            <input type="text" id="admin-quiz-opt3" class="admin-input admin-input-quiz" placeholder="Option D">
+          </div>
+          <div class="admin-grid" style="grid-template-columns: 200px 1fr; margin-top:12px;">
+            <select id="admin-quiz-ans" class="admin-input admin-input-quiz">
+              <option value="0">Option A is Correct</option>
+              <option value="1">Option B is Correct</option>
+              <option value="2">Option C is Correct</option>
+              <option value="3">Option D is Correct</option>
+            </select>
+            <input type="text" id="admin-quiz-exp" class="admin-input admin-input-quiz" placeholder="Explain why it is correct">
+          </div>
+          <button class="btn btn-primary" id="admin-add-quiz-btn" style="margin-top:12px; width:100%; justify-content:center;">Publish Quiz Question</button>
         </div>
+      </section>
+
+      <!-- SECTIONS HELD FOR DOCKS -->
+      <section id="mistakes" class="app-section" style="display: none;">
+        <h2 style="font-size: 2rem; margin-bottom: 1.5rem;"><i class="fa-solid fa-triangle-exclamation"></i> SQL Anti-Patterns & Beginner Mistakes</h2>
+        <div class="mistakes-grid" id="mistakes-list"></div>
+      </section>
+
+      <section id="tips" class="app-section" style="display: none;">
+        <h2 style="font-size: 2rem; margin-bottom: 1.5rem;"><i class="fa-solid fa-lightbulb"></i> SQL Interview Strategies</h2>
+        <div class="tips-layout" id="tips-list-container"></div>
       </section>
 
     </main>
