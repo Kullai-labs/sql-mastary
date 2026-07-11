@@ -110,6 +110,7 @@
         <button class="nav-link" data-target="roadmap"><i class="fa-solid fa-map-location-dot"></i> Roadmap</button>
         <button class="nav-link" data-target="syllabus"><i class="fa-solid fa-book-open"></i> Learn SQL</button>
         <button class="nav-link" data-target="questions"><i class="fa-solid fa-clipboard-question"></i> 70 MNC Qs</button>
+        <button class="nav-link" data-target="projects"><i class="fa-solid fa-folder-open"></i> Projects</button>
         <button class="nav-link" data-target="resources"><i class="fa-solid fa-cubes"></i> Resources</button>
         <button class="nav-link" data-target="path_finder"><i class="fa-solid fa-compass"></i> Path Finder</button>
         <button class="nav-link" data-target="simulator"><i class="fa-solid fa-terminal"></i> Simulator</button>
@@ -400,6 +401,101 @@
       <section id="tips" class="app-section" style="display: none;">
         <h2 style="font-size: 2rem; margin-bottom: 1.5rem;"><i class="fa-solid fa-lightbulb"></i> SQL Interview Strategies</h2>
         <div class="tips-layout" id="tips-list-container"></div>
+      </section>
+
+      <!-- SECTION 10: CASE STUDY PROJECTS DASHBOARD -->
+      <section id="projects" class="app-section" style="display: none;">
+        <h2 style="font-size: 2rem; margin-bottom: 0.5rem;"><i class="fa-solid fa-folder-open"></i> Portfolio Case Studies</h2>
+        <p style="color: var(--text-muted); margin-bottom: 2rem;">Explore real-world mock databases, analyze business metrics, and click "Open in Simulator" to write and execute SQL queries.</p>
+        
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem;">
+          
+          <!-- Swiggy -->
+          <div class="glass-card" style="display: flex; flex-direction: column; justify-content: space-between; height: 100%;">
+            <div>
+              <span class="tag tag-medium">Swiggy Case Study</span>
+              <h3 style="font-size: 1.3rem; margin-top: 8px; color: var(--accent-pink);"><i class="fa-solid fa-pizza-slice"></i> Food Delivery App</h3>
+              <p style="font-size: 0.9rem; color: var(--text-muted); margin-top: 8px; line-height: 1.5;">
+                Analyze customer ordering habits, cuisine revenues, and restaurant ratings on Swiggy's dining platform.
+              </p>
+              <div style="margin-top: 12px;">
+                <strong style="font-size: 0.8rem; color: var(--text-main);">Tables included:</strong>
+                <div style="display: flex; gap: 6px; margin-top: 4px; flex-wrap: wrap;">
+                  <span class="tag tag-company" style="font-size: 0.7rem;">swiggy_users</span>
+                  <span class="tag tag-company" style="font-size: 0.7rem;">restaurants</span>
+                  <span class="tag tag-company" style="font-size: 0.7rem;">swiggy_orders</span>
+                </div>
+              </div>
+            </div>
+            <button class="btn btn-primary" onclick="launchProject('swiggy')" style="margin-top: 1.5rem; justify-content: center; width: 100%;">
+              Open in Simulator <i class="fa-solid fa-play"></i>
+            </button>
+          </div>
+
+          <!-- Rapido -->
+          <div class="glass-card" style="display: flex; flex-direction: column; justify-content: space-between; height: 100%;">
+            <div>
+              <span class="tag tag-medium">Rapido Case Study</span>
+              <h3 style="font-size: 1.3rem; margin-top: 8px; color: var(--accent-cyan);"><i class="fa-solid fa-motorcycle"></i> Ride Hailing</h3>
+              <p style="font-size: 0.9rem; color: var(--text-muted); margin-top: 8px; line-height: 1.5;">
+                Measure driver performance and rating stats, trip distances, and vehicle fares on ride bookings.
+              </p>
+              <div style="margin-top: 12px;">
+                <strong style="font-size: 0.8rem; color: var(--text-main);">Tables included:</strong>
+                <div style="display: flex; gap: 6px; margin-top: 4px; flex-wrap: wrap;">
+                  <span class="tag tag-company" style="font-size: 0.7rem;">rapido_drivers</span>
+                  <span class="tag tag-company" style="font-size: 0.7rem;">rides</span>
+                </div>
+              </div>
+            </div>
+            <button class="btn btn-primary" onclick="launchProject('rapido')" style="margin-top: 1.5rem; justify-content: center; width: 100%;">
+              Open in Simulator <i class="fa-solid fa-play"></i>
+            </button>
+          </div>
+
+          <!-- Amazon -->
+          <div class="glass-card" style="display: flex; flex-direction: column; justify-content: space-between; height: 100%;">
+            <div>
+              <span class="tag tag-easy">Amazon Case Study</span>
+              <h3 style="font-size: 1.3rem; margin-top: 8px; color: var(--accent-pink);"><i class="fa-solid fa-bag-shopping"></i> E-Commerce Platform</h3>
+              <p style="font-size: 0.9rem; color: var(--text-muted); margin-top: 8px; line-height: 1.5;">
+                Track product inventory reserves, calculate brand popularity, and trigger low-stock alerts.
+              </p>
+              <div style="margin-top: 12px;">
+                <strong style="font-size: 0.8rem; color: var(--text-main);">Tables included:</strong>
+                <div style="display: flex; gap: 6px; margin-top: 4px; flex-wrap: wrap;">
+                  <span class="tag tag-company" style="font-size: 0.7rem;">amazon_products</span>
+                  <span class="tag tag-company" style="font-size: 0.7rem;">orders</span>
+                </div>
+              </div>
+            </div>
+            <button class="btn btn-primary" onclick="launchProject('amazon')" style="margin-top: 1.5rem; justify-content: center; width: 100%;">
+              Open in Simulator <i class="fa-solid fa-play"></i>
+            </button>
+          </div>
+
+          <!-- Spotify -->
+          <div class="glass-card" style="display: flex; flex-direction: column; justify-content: space-between; height: 100%;">
+            <div>
+              <span class="tag tag-hard">Spotify Case Study</span>
+              <h3 style="font-size: 1.3rem; margin-top: 8px; color: var(--accent-purple);"><i class="fa-solid fa-music"></i> Music Streaming</h3>
+              <p style="font-size: 0.9rem; color: var(--text-muted); margin-top: 8px; line-height: 1.5;">
+                Aggregate song streaming plays, listener histories, and track durations.
+              </p>
+              <div style="margin-top: 12px;">
+                <strong style="font-size: 0.8rem; color: var(--text-main);">Tables included:</strong>
+                <div style="display: flex; gap: 6px; margin-top: 4px; flex-wrap: wrap;">
+                  <span class="tag tag-company" style="font-size: 0.7rem;">spotify_tracks</span>
+                  <span class="tag tag-company" style="font-size: 0.7rem;">play_history</span>
+                </div>
+              </div>
+            </div>
+            <button class="btn btn-primary" onclick="launchProject('spotify')" style="margin-top: 1.5rem; justify-content: center; width: 100%;">
+              Open in Simulator <i class="fa-solid fa-play"></i>
+            </button>
+          </div>
+
+        </div>
       </section>
 
       <!-- SECTION 9: RESUME & PORTFOLIO BUILDER -->

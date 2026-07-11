@@ -217,6 +217,16 @@ function initRouter() {
   });
 
   window.navigateTo("home");
+
+  window.launchProject = (projName) => {
+    const selectEl = document.getElementById("project-select");
+    if (selectEl) {
+      selectEl.value = projName;
+      // Dispatch a change event so the project select change handler runs!
+      selectEl.dispatchEvent(new Event("change"));
+    }
+    window.navigateTo("simulator");
+  };
 }
 
 /* ==========================================================================
