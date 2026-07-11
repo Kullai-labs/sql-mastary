@@ -3,7 +3,7 @@
 Welcome to the **SQL Mastery Hub**! This is a premium, interactive, glassmorphic education platform designed to help you master SQL from scratch, solve frequently asked interview questions, avoid common mistakes, and practice queries in real-time.
 
 Live Code Repository: [https://github.com/Kullai-labs/sql-mastary](https://github.com/Kullai-labs/sql-mastary)
-live webiste link: https://sql-mastary.vercel.app/
+
 ---
 
 ## 🚀 Key Features

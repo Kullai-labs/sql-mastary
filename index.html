@@ -103,7 +103,7 @@
     <header>
       <div class="logo" data-navigate="home">
         <i class="fa-solid fa-atom"></i> SQL Mastery Hub
-        <!-- <span class="logo-sub">Super Site</span> -->
+        <span class="logo-sub">Super Site</span>
       </div>
       <nav>
         <button class="nav-link" data-target="home"><i class="fa-solid fa-house"></i> Home</button>
@@ -114,6 +114,7 @@
         <button class="nav-link" data-target="path_finder"><i class="fa-solid fa-compass"></i> Path Finder</button>
         <button class="nav-link" data-target="simulator"><i class="fa-solid fa-terminal"></i> Simulator</button>
         <button class="nav-link" data-target="quiz"><i class="fa-solid fa-graduation-cap"></i> Quiz</button>
+        <button class="nav-link" data-target="resume"><i class="fa-solid fa-file-invoice"></i> Resume Guide</button>
       </nav>
     </header>
 
@@ -401,11 +402,84 @@
         <div class="tips-layout" id="tips-list-container"></div>
       </section>
 
+      <!-- SECTION 9: RESUME & PORTFOLIO BUILDER -->
+      <section id="resume" class="app-section" style="display: none;">
+        <h2 style="font-size: 2rem; margin-bottom: 1.5rem;"><i class="fa-solid fa-file-invoice"></i> SQL Portfolio & Resume Guide</h2>
+        <div class="glass-card" style="margin-bottom: 2rem;">
+          <h3 style="color: var(--accent-cyan); font-size: 1.3rem; margin-bottom: 0.8rem;">1. Listing SQL Skills on Your Resume</h3>
+          <p style="color: var(--text-muted); font-size: 0.95rem; line-height: 1.6; margin-bottom: 1rem;">
+            When applying to MNCs, don't just list "SQL" under your skills. Categorize it to show depth:
+          </p>
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem;">
+            <div style="background: rgba(255,255,255,0.02); padding: 12px; border-radius: 6px; border: 1px solid var(--glass-border);">
+              <strong style="color: var(--accent-pink);">Basic/Intermediate</strong>
+              <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 5px;">Joins, Aggregations, Subqueries, Group By, Filtering.</p>
+            </div>
+            <div style="background: rgba(255,255,255,0.02); padding: 12px; border-radius: 6px; border: 1px solid var(--glass-border);">
+              <strong style="color: var(--accent-cyan);">Advanced Analytics</strong>
+              <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 5px;">Window Functions, CTEs, Cohort Analysis, Recursive Queries.</p>
+            </div>
+            <div style="background: rgba(255,255,255,0.02); padding: 12px; border-radius: 6px; border: 1px solid var(--glass-border);">
+              <strong style="color: var(--accent-purple);">Database Optimization</strong>
+              <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 5px;">Indexing (B-Tree, Hash), Query Execution Plans, Partitioning.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="glass-card" style="margin-bottom: 2rem;">
+          <h3 style="color: var(--accent-cyan); font-size: 1.3rem; margin-bottom: 0.8rem;">2. Case Study Resume Bullet Points</h3>
+          <p style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 1.2rem;">Copy and customize these high-impact description lines for your projects section:</p>
+          
+          <div style="display: flex; flex-direction: column; gap: 1.2rem;">
+            <div style="border-left: 3px solid var(--accent-purple); padding-left: 15px;">
+              <strong style="color: var(--text-main);">Swiggy Analytics Project</strong>
+              <blockquote style="font-style: italic; font-size: 0.9rem; color: var(--text-muted); margin-top: 6px;">
+                "Designed and implemented a relational schema for a mock Swiggy database; wrote complex multi-table JOINs and GROUP BY aggregation scripts to calculate restaurant revenues, user order frequencies, and average spending habits."
+              </blockquote>
+            </div>
+
+            <div style="border-left: 3px solid var(--accent-cyan); padding-left: 15px;">
+              <strong style="color: var(--text-main);">Rapido Driver Metrics</strong>
+              <blockquote style="font-style: italic; font-size: 0.9rem; color: var(--text-muted); margin-top: 6px;">
+                "Engineered SQL queries incorporating CASE logic and conditional filtering to aggregate Rapido ride metrics, quantifying drivers' trip completion percentages, cancellations, and average fare metrics per vehicle type."
+              </blockquote>
+            </div>
+
+            <div style="border-left: 3px solid var(--accent-pink); padding-left: 15px;">
+              <strong style="color: var(--text-main);">Amazon Inventory Monitoring</strong>
+              <blockquote style="font-style: italic; font-size: 0.9rem; color: var(--text-muted); margin-top: 6px;">
+                "Constructed database schemas utilizing integrity constraints and CHECK directives to model Amazon sales; wrote alert scripts to identify stock shortages and report total revenues aggregated by brand names."
+              </blockquote>
+            </div>
+
+            <div style="border-left: 3px solid var(--accent-purple); padding-left: 15px;">
+              <strong style="color: var(--text-main);">Spotify Streaming Insights</strong>
+              <blockquote style="font-style: italic; font-size: 0.9rem; color: var(--text-muted); margin-top: 6px;">
+                "Created streaming log analytics templates tracking songs play counts and artist streams; utilized sorting and limit partitions to identify top-performing audio content."
+              </blockquote>
+            </div>
+          </div>
+        </div>
+
+        <div class="glass-card">
+          <h3 style="color: var(--accent-cyan); font-size: 1.3rem; margin-bottom: 0.8rem;">3. Submitting to GitHub Portfolio</h3>
+          <p style="color: var(--text-muted); font-size: 0.95rem; line-height: 1.6; margin-bottom: 1rem;">
+            Follow these steps to submit your completed work to GitHub and showcase it to recruiters:
+          </p>
+          <ul style="list-style: none; display: flex; flex-direction: column; gap: 8px; font-size: 0.9rem;">
+            <li><i class="fa-solid fa-circle-check" style="color: var(--accent-cyan); margin-right: 8px;"></i> Create a new GitHub repository named <code>sql-portfolio</code>.</li>
+            <li><i class="fa-solid fa-circle-check" style="color: var(--accent-cyan); margin-right: 8px;"></i> Upload the case-study SQL scripts from the <code>/projects</code> folder in this repository.</li>
+            <li><i class="fa-solid fa-circle-check" style="color: var(--accent-cyan); margin-right: 8px;"></i> Add a detailed <code>README.md</code> explaining the problem, the database schema, and listing the queries.</li>
+            <li><i class="fa-solid fa-circle-check" style="color: var(--accent-cyan); margin-right: 8px;"></i> Link your GitHub repository in your resume portfolio section.</li>
+          </ul>
+        </div>
+      </section>
+
     </main>
 
     <!-- Footer -->
     <footer>
-      <p>&copy; 2026 SQL Mastery Hub. Generated with <span>&hearts;</span> M Kullai </p>
+      <p>&copy; 2026 SQL Mastery Hub. Generated with <span>&hearts;</span> and Gravity physics.</p>
     </footer>
 
   </div>
