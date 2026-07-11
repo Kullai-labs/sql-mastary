@@ -25,6 +25,7 @@ let DYNAMIC_SCHEMAS = {
   departments: { dept_id: "INT", dept_name: "VARCHAR", location: "VARCHAR" },
   employees: { emp_id: "INT", first_name: "VARCHAR", last_name: "VARCHAR", dept_id: "INT", salary: "INT", hire_date: "DATE" }
 };
+let userCreatedTables = [];
 
 document.addEventListener("DOMContentLoaded", () => {
   initGravityCanvas();
@@ -538,11 +539,13 @@ function initSQLSimulator() {
     }
   });
 
+
   // Project selector logic
   projectSelect.addEventListener("change", () => {
     const projName = projectSelect.value;
     if (projName === "none") {
       projectChallenges.innerHTML = "";
+      refreshSchemaPanel();
       return;
     }
 
@@ -564,14 +567,20 @@ function initSQLSimulator() {
 
     // Show challenge prompts
     projectChallenges.innerHTML = `
-      <h4>${proj.title} Challenges</h4>
-      <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 8px;">${proj.desc} Click any challenge to load it:</p>
-      <div style="display: flex; flex-direction: column; gap: 8px;">
-        ${proj.challenges.map((c) => `
-          <button class="topic-btn" style="padding: 6px; font-size: 0.85rem;" onclick="loadChallengeQuery('${c.sql.replace(/'/g, "\\'")}')">
-            ${c.q}
-          </button>
-        `).join("")}
+      <div class="glass-card" style="margin-top: 1.5rem; padding: 1.2rem;">
+        <h3 style="color: var(--accent-cyan); font-size: 1.1rem; margin-bottom: 8px;"><i class="fa-solid fa-circle-check"></i> ${proj.title} Challenges</h3>
+        <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 12px;">${proj.desc}</p>
+        <div style="display: flex; flex-direction: column; gap: 8px;">
+          ${proj.challenges.map((c, idx) => `
+            <div style="background: rgba(255,255,255,0.02); border: 1px solid var(--glass-border); padding: 8px 12px; border-radius: 6px;">
+              <span style="font-size: 0.75rem; color: var(--accent-pink); font-weight: bold; display: block; margin-bottom: 4px;">CHALLENGE #${idx + 1}</span>
+              <p style="font-size: 0.85rem; color: var(--text-main); margin-bottom: 8px;">${c.q}</p>
+              <button class="q-copy-btn" style="padding: 4px 10px; font-size: 0.75rem;" onclick="loadChallengeQuery('${c.sql.replace(/'/g, "\\'")}')">
+                Load Query <i class="fa-solid fa-terminal"></i>
+              </button>
+            </div>
+          `).join("")}
+        </div>
       </div>
     `;
   });
@@ -584,16 +593,25 @@ function initSQLSimulator() {
     const panel = document.getElementById("simulator-schema-panel");
     if (!panel) return;
 
-    panel.innerHTML = Object.keys(DYNAMIC_SCHEMAS).map((table) => `
-      <div class="glass-card schema-card" style="margin-bottom: 10px;">
-        <h4>${table} <i class="fa-solid fa-table"></i></h4>
-        <ul class="schema-fields">
-          ${Object.keys(DYNAMIC_SCHEMAS[table]).map((field) => `
-            <li><span>${field}</span> <span>${DYNAMIC_SCHEMAS[table][field]}</span></li>
-          `).join("")}
-        </ul>
-      </div>
-    `).join("");
+    const projName = projectSelect.value;
+    let allowedTables = ["employees", "departments", ...userCreatedTables];
+    
+    if (projName && projName !== "none" && window.MOCK_PROJECTS[projName]) {
+      allowedTables = [...Object.keys(window.MOCK_PROJECTS[projName].tables), ...userCreatedTables];
+    }
+
+    panel.innerHTML = Object.keys(DYNAMIC_SCHEMAS)
+      .filter((table) => allowedTables.includes(table))
+      .map((table) => `
+        <div class="glass-card schema-card" style="margin-bottom: 10px;">
+          <h4>${table} <i class="fa-solid fa-table"></i></h4>
+          <ul class="schema-fields">
+            ${Object.keys(DYNAMIC_SCHEMAS[table]).map((field) => `
+              <li><span>${field}</span> <span>${DYNAMIC_SCHEMAS[table][field]}</span></li>
+            `).join("")}
+          </ul>
+        </div>
+      `).join("");
   };
 
   function renderTerminalTable(rows) {
@@ -634,6 +652,7 @@ function executeCreateQuery(sql) {
 
   MOCK_DB[tableName] = [];
   DYNAMIC_SCHEMAS[tableName] = {};
+  userCreatedTables.push(tableName);
 
   fieldsDef.split(",").forEach((def) => {
     const parts = def.trim().split(/\s+/);
