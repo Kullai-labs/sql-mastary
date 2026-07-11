@@ -286,14 +286,17 @@ main {
 }
 
 .hero-features {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
   gap: 1.5rem;
   margin-top: 3rem;
   width: 100%;
 }
 
 .feature-card {
+  flex: 1 1 240px;
+  max-width: 300px;
   text-align: left;
   cursor: pointer;
 }
