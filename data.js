@@ -1088,11 +1088,157 @@ JOIN Follow f2 ON f1.followee = f2.follower
 GROUP BY f1.followee
 ORDER BY f1.followee;`,
     explanation: "We join the follow table onto itself where the follower of one relation matches the followee of another. This guarantees the user is a second-degree entity. Grouping by followee yields their follower count."
+  },
+  {
+    id: 21,
+    title: "Rolling Active Drivers (Uber)",
+    difficulty: "Medium",
+    category: "Window Functions",
+    companies: ["Uber", "Lyft"],
+    problem: "Write a SQL query to calculate the rolling 7-day average of active drivers for each login date. Output date and rolling average.",
+    schema: `Table: DriverLogins
++-------------+---------+
+| Column Name | Type    |
++-------------+---------+
+| driver_id   | int     |
+| login_date  | date    |
++-------------+---------+`,
+    solution: `WITH DailyActive AS (
+    SELECT login_date, COUNT(DISTINCT driver_id) AS active_drivers
+    FROM DriverLogins
+    GROUP BY login_date
+)
+SELECT login_date,
+       AVG(active_drivers) OVER(
+           ORDER BY login_date
+           ROWS BETWEEN 6 PRECEDING AND CURRENT ROW
+       ) AS rolling_7day_avg
+FROM DailyActive;`,
+    explanation: "We first compute daily active driver counts. Then, we use a window function AVG() spanning the current row and 6 preceding rows to calculate a 7-day rolling average."
+  },
+  {
+    id: 22,
+    title: "Frequently Co-Purchased Pairs (Amazon)",
+    difficulty: "Hard",
+    category: "Joins",
+    companies: ["Amazon", "Flipkart", "eBay"],
+    problem: "Find the top 3 pairs of products most frequently purchased together in the same order. Display product_id_1, product_id_2, and the purchase frequency count.",
+    schema: `Table: OrderItems
++-------------+---------+
+| Column Name | Type    |
++-------------+---------+
+| order_id    | int     |
+| product_id  | int     |
++-------------+---------+`,
+    solution: `WITH Pairs AS (
+    SELECT o1.product_id AS p1, o2.product_id AS p2
+    FROM OrderItems o1
+    JOIN OrderItems o2 ON o1.order_id = o2.order_id AND o1.product_id < o2.product_id
+)
+SELECT p1, p2, COUNT(*) AS pair_frequency
+FROM Pairs
+GROUP BY p1, p2
+ORDER BY pair_frequency DESC
+LIMIT 3;`,
+    explanation: "We self-join OrderItems on order_id. The condition o1.product_id < o2.product_id avoids duplicate pairs (A, B and B, A) and pairing an item with itself. Grouping gives co-occurrence counts."
+  },
+  {
+    id: 23,
+    title: "Median Session Duration (Google)",
+    difficulty: "Medium",
+    category: "Window Functions",
+    companies: ["Google", "Meta", "Youtube"],
+    problem: "Calculate the median session duration for each user. For an even number of sessions, return the average of the two middle values.",
+    schema: `Table: UserSessions
++--------------+---------+
+| Column Name  | Type    |
++--------------+---------+
+| user_id      | int     |
+| duration_sec | int     |
++--------------+---------+`,
+    solution: `WITH RankedSessions AS (
+    SELECT user_id, duration_sec,
+           ROW_NUMBER() OVER(PARTITION BY user_id ORDER BY duration_sec) AS rn,
+           COUNT(*) OVER(PARTITION BY user_id) AS total_sessions
+    FROM UserSessions
+)
+SELECT user_id, AVG(duration_sec) AS median_duration
+FROM RankedSessions
+WHERE rn IN (FLOOR((total_sessions + 1) / 2.0), CEIL((total_sessions + 1) / 2.0))
+GROUP BY user_id;`,
+    explanation: "We number sessions sorted by duration. Filtering row numbers corresponding to middle indices (using FLOOR and CEIL to handle odd and even totals) returns the median."
+  },
+  {
+    id: 24,
+    title: "Month-over-Month Growth (Meta)",
+    difficulty: "Hard",
+    category: "Window Functions",
+    companies: ["Meta", "LinkedIn", "TikTok"],
+    problem: "Calculate the Month-over-Month (MoM) growth rate of Monthly Active Users (MAU). Output the year-month, the active user count, and the growth percentage rounded to 2 decimal places.",
+    schema: `Table: UserEvents
++-------------+---------+
+| Column Name | Type    |
++-------------+---------+
+| user_id     | int     |
+| event_date  | date    |
++-------------+---------+`,
+    solution: `WITH MonthlyUsers AS (
+    SELECT DATE_FORMAT(event_date, '%Y-%m') AS ym,
+           COUNT(DISTINCT user_id) AS active_users
+    FROM UserEvents
+    GROUP BY DATE_FORMAT(event_date, '%Y-%m')
+),
+Growth AS (
+    SELECT ym, active_users,
+           LAG(active_users, 1) OVER(ORDER BY ym) AS prev_users
+    FROM MonthlyUsers
+)
+SELECT ym, active_users,
+       ROUND((active_users - prev_users) * 100.0 / prev_users, 2) AS mom_growth_pct
+FROM Growth;`,
+    explanation: "First, compute monthly active user counts. Second, use LAG() to fetch the previous month's user count and compute the growth percentage."
+  },
+  {
+    id: 25,
+    title: "Sessionization Breaks (Spotify)",
+    difficulty: "Hard",
+    category: "Window Functions",
+    companies: ["Spotify", "Apple Music"],
+    problem: "Streams are grouped into listening sessions. A new session starts if a user hasn't played a song for more than 15 minutes. Find the start and end time of each session for each user.",
+    schema: `Table: PlayLogs
++-------------+-----------+
+| Column Name | Type      |
++-------------+-----------+
+| user_id     | int       |
+| play_time   | timestamp |
+| song_id     | int       |
++-------------+-----------+`,
+    solution: `WITH LogDiffs AS (
+    SELECT user_id, play_time,
+           LAG(play_time) OVER(PARTITION BY user_id ORDER BY play_time) AS prev_play
+    FROM PlayLogs
+),
+SessionFlags AS (
+    SELECT user_id, play_time,
+           CASE WHEN prev_play IS NULL OR TIMESTAMPDIFF(MINUTE, prev_play, play_time) > 15 THEN 1 ELSE 0 END AS new_session
+    FROM LogDiffs
+),
+SessionGroups AS (
+    SELECT user_id, play_time,
+           SUM(new_session) OVER(PARTITION BY user_id ORDER BY play_time) AS session_id
+    FROM SessionFlags
+)
+SELECT user_id, session_id,
+       MIN(play_time) AS session_start,
+       MAX(play_time) AS session_end
+FROM SessionGroups
+GROUP BY user_id, session_id;`,
+    explanation: "Using LAG, we flag records where play_time is spaced >15 minutes apart as a new session. Running sum builds session IDs, and GROUP BY fetches start/end boundaries."
   }
 ];
 
 // Append remaining LeetCode questions placeholder to fit full 70 items count in runtime
-for (let i = 21; i <= 70; i++) {
+for (let i = 26; i <= 70; i++) {
   const diffs = ["Easy", "Medium", "Hard"];
   const cats = ["Joins", "Subqueries", "Window Functions", "Aggregations", "Basics"];
   const companiesList = [["Google", "Amazon"], ["Meta", "Netflix"], ["Microsoft", "Uber"], ["Apple", "Stripe"], ["Stripe", "PayPal"]];
